@@ -36,36 +36,50 @@ function makeReferencePaladin(): Build {
     extraAdditive: [],
     extraMultipliers: [],
     slots: [
-      { id: 'helm',   name: 'Helm',   affixes: [
-        { bucket: 'ADDITIVE', value: 2.127 },
-        { bucket: 'ADDITIVE', value: 1.0 },
-        { bucket: 'ADDITIVE', value: 1.89 },
-      ] },
-      { id: 'chest',  name: 'Chest',  affixes: [{ bucket: 'MAINSTAT', value: 392 }] },
-      { id: 'pants',  name: 'Pants',  affixes: [] },
-      { id: 'boots',  name: 'Boots',  affixes: [{ bucket: 'MAINSTAT', value: 151 }] },
-      { id: 'gloves', name: 'Gloves', affixes: [
-        { bucket: 'CSDM', value: 0.63 }, { bucket: 'VDM', value: 0.35 }, { bucket: 'CRITCHANCE', value: 0.106 },
-      ]},
-      { id: 'amulet', name: 'Amulet', affixes: [
-        { bucket: 'VDM', value: 0.35 }, { bucket: 'CRITCHANCE', value: 0.106 },
-      ]},
-      { id: 'ring1', name: 'Ring 1', affixes: [
-        { bucket: 'CSDM', value: 0.31 }, { bucket: 'VDM', value: 0.18 }, { bucket: 'CRITCHANCE', value: 0.063 },
-      ]},
-      { id: 'ring2', name: 'Ring 2', affixes: [
-        { bucket: 'CSDM', value: 0.31 }, { bucket: 'VDM', value: 0.18 }, { bucket: 'CRITCHANCE', value: 0.063 },
-      ]},
-      { id: 'wep1', name: 'Weapon 1', weaponTypeId: '2h_polearm', affixes: [
-        // Combined 1H+1H+2H affixes from the spreadsheet's filled example
-        { bucket: 'CSDM', value: 0.5 + 0.5 + 1.0 },          // 1H wep1 + 1H wep2 + 2H
-        { bucket: 'ALLM', value: 0.25 },                       // 2H ALLM
-        { bucket: 'MAINSTAT', value: 225 + 225 + 450 },        // both 1H + 2H mainstat
-        { bucket: 'ADDITIVE', value: 1.2 },                    // 2H temper
-        { bucket: 'WEPDMG', value: 400 },                      // 2H wep roll
-        { bucket: 'GEM', value: 0.24 + 0.24 + 0.48 },          // 1H+1H+2H gems
-      ]},
-      { id: 'wep2', name: 'Weapon 2', weaponTypeId: 'none', affixes: [] },
+      {
+        id: 'helm', name: 'Helm', affixes: [
+          { bucket: 'ADDITIVE', value: 2.127 },
+          { bucket: 'ADDITIVE', value: 1.0 },
+          { bucket: 'ADDITIVE', value: 1.89 },
+        ]
+      },
+      { id: 'chest', name: 'Chest', affixes: [{ bucket: 'MAINSTAT', value: 392 }] },
+      { id: 'pants', name: 'Pants', affixes: [] },
+      { id: 'boots', name: 'Boots', text: "鞋子", affixes: [{ bucket: 'MAINSTAT', value: 151 }] },
+      {
+        id: 'gloves', name: 'Gloves', affixes: [
+          { bucket: 'CSDM', value: 0.63 }, { bucket: 'VDM', value: 0.35 }, { bucket: 'CRITCHANCE', value: 0.106 },
+        ]
+      },
+      {
+        id: 'amulet', name: 'Amulet', affixes: [
+          { bucket: 'VDM', value: 0.35 }, { bucket: 'CRITCHANCE', value: 0.106 },
+        ]
+      },
+      {
+        id: 'ring1', name: 'Ring 1', text: "戒指 1", affixes: [
+          { bucket: 'CSDM', value: 0.31 }, { bucket: 'VDM', value: 0.18 }, { bucket: 'CRITCHANCE', value: 0.063 },
+        ]
+      },
+      {
+        id: 'ring2', name: 'Ring 2', text: "戒指 2", affixes: [
+          { bucket: 'CSDM', value: 0.31 }, { bucket: 'VDM', value: 0.18 }, { bucket: 'CRITCHANCE', value: 0.063 },
+        ]
+      },
+      {
+        id: 'wep1', name: '武器 1', weaponTypeId: '2h_polearm', affixes: [
+          // Combined 1H+1H+2H affixes from the spreadsheet's filled example
+          {
+            bucket: 'CSDM', value: 0.5 + 0.5 + 1.0
+          },          // 1H wep1 + 1H wep2 + 2H
+          { bucket: 'ALLM', value: 0.25 },                       // 2H ALLM
+          { bucket: 'MAINSTAT', value: 225 + 225 + 450 },        // both 1H + 2H mainstat
+          { bucket: 'ADDITIVE', value: 1.2 },                    // 2H temper
+          { bucket: 'WEPDMG', value: 400 },                      // 2H wep roll
+          { bucket: 'GEM', value: 0.24 + 0.24 + 0.48 },          // 1H+1H+2H gems
+        ]
+      },
+      { id: 'wep2', name: '武器 2', weaponTypeId: 'none', affixes: [] },
     ],
   };
   // Set additive lines to match the sheet (close/elites/healthy lines were removed from defaults;

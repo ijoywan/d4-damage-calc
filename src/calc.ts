@@ -3,15 +3,15 @@
 
 export type ClassId = 'Paladin' | 'Barbarian' | 'Druid' | 'Necromancer' | 'Rogue' | 'Sorcerer' | 'Spiritborn' | 'Warlock';
 
-export const CLASSES: { id: ClassId; mainStat: string; divisor: number; weaponSlots: number }[] = [
-  { id: 'Paladin',      mainStat: 'Strength',     divisor: 800, weaponSlots: 2 },
-  { id: 'Barbarian',    mainStat: 'Strength',     divisor: 900, weaponSlots: 4 },
-  { id: 'Druid',        mainStat: 'Willpower',    divisor: 800, weaponSlots: 2 },
-  { id: 'Necromancer',  mainStat: 'Intelligence', divisor: 800, weaponSlots: 2 },
-  { id: 'Rogue',        mainStat: 'Dexterity',    divisor: 800, weaponSlots: 3 },
-  { id: 'Sorcerer',     mainStat: 'Intelligence', divisor: 800, weaponSlots: 2 },
-  { id: 'Spiritborn',   mainStat: 'Dexterity',    divisor: 800, weaponSlots: 1 },
-  { id: 'Warlock',      mainStat: 'Willpower',    divisor: 800, weaponSlots: 2 },
+export const CLASSES: { id: ClassId; mainStat: string; divisor: number; weaponSlots: number, text: string, mainStatText: string }[] = [
+  { id: 'Paladin', mainStat: 'Strength', divisor: 800, weaponSlots: 2, text: "圣骑士（力量）", mainStatText: "力量" },
+  { id: 'Barbarian', mainStat: 'Strength', divisor: 900, weaponSlots: 4, text: "野蛮人（力量）", mainStatText: "力量" },
+  { id: 'Druid', mainStat: 'Willpower', divisor: 800, weaponSlots: 2, text: "德鲁伊（意力）", mainStatText: "意力" },
+  { id: 'Necromancer', mainStat: 'Intelligence', divisor: 800, weaponSlots: 2, text: "死灵法师（智力）", mainStatText: "智力" },
+  { id: 'Rogue', mainStat: 'Dexterity', divisor: 800, weaponSlots: 3, text: "游侠（敏捷）", mainStatText: "敏捷" },
+  { id: 'Sorcerer', mainStat: 'Intelligence', divisor: 800, weaponSlots: 2, text: "巫师（智力）", mainStatText: "智力" },
+  { id: 'Spiritborn', mainStat: 'Dexterity', divisor: 800, weaponSlots: 1, text: "灵巫（敏捷）", mainStatText: "敏捷" },
+  { id: 'Warlock', mainStat: 'Willpower', divisor: 800, weaponSlots: 2, text: "术士（意力）", mainStatText: "意力" },
 ];
 
 // ---- Weapon types ----
@@ -28,28 +28,28 @@ export interface WeaponType {
 }
 
 export const WEAPON_TYPES: WeaponType[] = [
-  { id: 'none',        label: '(none)',                     baseDamage: 0,    speed: 0,    hands: 1 },
+  { id: 'none', label: '(无)', baseDamage: 0, speed: 0, hands: 1 },
   // 1H melee
-  { id: '1h_sword',    label: '1H Sword',                   baseDamage: 1884, speed: 1.1,  hands: 1, allowedClasses: ['Paladin','Barbarian','Druid','Necromancer','Rogue'] },
-  { id: '1h_mace',     label: '1H Mace',                    baseDamage: 1884, speed: 1.1,  hands: 1, allowedClasses: ['Paladin','Barbarian','Druid'] },
-  { id: '1h_axe',      label: '1H Axe',                     baseDamage: 1884, speed: 1.1,  hands: 1, allowedClasses: ['Paladin','Barbarian','Druid'] },
-  { id: '1h_dagger',   label: '1H Dagger',                  baseDamage: 1728, speed: 1.2,  hands: 1, allowedClasses: ['Rogue','Sorcerer','Warlock'] },
-  { id: '1h_flail',    label: '1H Flail',                   baseDamage: 1728, speed: 1.0,  hands: 1, allowedClasses: ['Rogue'] },
-  { id: '1h_wand',     label: 'Wand',                       baseDamage: 1728, speed: 1.2,  hands: 1, allowedClasses: ['Sorcerer','Necromancer','Warlock'] },
+  { id: '1h_sword', label: '单手剑', baseDamage: 1884, speed: 1.1, hands: 1, allowedClasses: ['Paladin', 'Barbarian', 'Druid', 'Necromancer', 'Rogue'] },
+  { id: '1h_mace', label: '单手杖', baseDamage: 1884, speed: 1.1, hands: 1, allowedClasses: ['Paladin', 'Barbarian', 'Druid'] },
+  { id: '1h_axe', label: '单手斧', baseDamage: 1884, speed: 1.1, hands: 1, allowedClasses: ['Paladin', 'Barbarian', 'Druid'] },
+  { id: '1h_dagger', label: '单手匕首', baseDamage: 1728, speed: 1.2, hands: 1, allowedClasses: ['Rogue', 'Sorcerer', 'Warlock'] },
+  { id: '1h_flail', label: '单手连枷', baseDamage: 1728, speed: 1.0, hands: 1, allowedClasses: ['Rogue'] },
+  { id: '1h_wand', label: '魔杖', baseDamage: 1728, speed: 1.2, hands: 1, allowedClasses: ['Sorcerer', 'Necromancer', 'Warlock'] },
   // Off-hands
-  { id: 'shield',      label: 'Shield (off-hand)',          baseDamage: 0,    speed: 0,    hands: 1, allowedClasses: ['Paladin','Barbarian','Necromancer'] },
-  { id: 'focus',       label: 'Focus (off-hand)',           baseDamage: 0,    speed: 0,    hands: 1, allowedClasses: ['Sorcerer','Necromancer','Druid','Warlock','Paladin'] },
+  { id: 'shield', label: '盾牌（副手）', baseDamage: 0, speed: 0, hands: 1, allowedClasses: ['Paladin', 'Barbarian', 'Necromancer'] },
+  { id: 'focus', label: '法器（副手）', baseDamage: 0, speed: 0, hands: 1, allowedClasses: ['Sorcerer', 'Necromancer', 'Druid', 'Warlock', 'Paladin'] },
   // 2H melee
-  { id: '2h_mace',     label: '2H Mace',                    baseDamage: 4607, speed: 0.9,  hands: 2, allowedClasses: ['Barbarian','Druid','Paladin'] },
-  { id: '2h_axe',      label: '2H Axe',                     baseDamage: 4607, speed: 0.9,  hands: 2, allowedClasses: ['Barbarian','Druid'] },
-  { id: '2h_sword',    label: '2H Sword',                   baseDamage: 4146, speed: 1.0,  hands: 2, allowedClasses: ['Barbarian','Necromancer','Paladin'] },
-  { id: '2h_scythe',   label: '2H Scythe',                  baseDamage: 4607, speed: 0.9,  hands: 2, allowedClasses: ['Necromancer','Druid'] },
-  { id: '2h_polearm',  label: '2H Polearm',                 baseDamage: 4607, speed: 0.9,  hands: 2, allowedClasses: ['Paladin','Spiritborn'] },
-  { id: '2h_glaive',   label: '2H Glaive',                  baseDamage: 4146, speed: 1.0,  hands: 2, allowedClasses: ['Spiritborn'] },
-  { id: '2h_qstaff',   label: '2H Quarterstaff',            baseDamage: 3768, speed: 1.0,  hands: 2, allowedClasses: ['Spiritborn','Sorcerer','Druid','Warlock'] },
+  { id: '2h_mace', label: '双手锤', baseDamage: 4607, speed: 0.9, hands: 2, allowedClasses: ['Barbarian', 'Druid', 'Paladin'] },
+  { id: '2h_axe', label: '双手斧', baseDamage: 4607, speed: 0.9, hands: 2, allowedClasses: ['Barbarian', 'Druid'] },
+  { id: '2h_sword', label: '双手剑', baseDamage: 4146, speed: 1.0, hands: 2, allowedClasses: ['Barbarian', 'Necromancer', 'Paladin'] },
+  { id: '2h_scythe', label: '双手镰刀', baseDamage: 4607, speed: 0.9, hands: 2, allowedClasses: ['Necromancer', 'Druid'] },
+  { id: '2h_polearm', label: '双手长柄武器', baseDamage: 4607, speed: 0.9, hands: 2, allowedClasses: ['Paladin', 'Spiritborn'] },
+  { id: '2h_glaive', label: '双手长柄刀', baseDamage: 4146, speed: 1.0, hands: 2, allowedClasses: ['Spiritborn'] },
+  { id: '2h_qstaff', label: '双手杖', baseDamage: 3768, speed: 1.0, hands: 2, allowedClasses: ['Spiritborn', 'Sorcerer', 'Druid', 'Warlock'] },
   // 2H ranged
-  { id: '2h_bow',      label: '2H Bow',                     baseDamage: 3768, speed: 1.0,  hands: 2, allowedClasses: ['Rogue'] },
-  { id: '2h_xbow',     label: '2H Crossbow',                baseDamage: 4607, speed: 0.85, hands: 2, allowedClasses: ['Rogue'] },
+  { id: '2h_bow', label: '弓', baseDamage: 3768, speed: 1.0, hands: 2, allowedClasses: ['Rogue'] },
+  { id: '2h_xbow', label: '弩', baseDamage: 4607, speed: 0.85, hands: 2, allowedClasses: ['Rogue'] },
 ];
 
 export function weaponTypeById(id: string): WeaponType {
@@ -68,40 +68,41 @@ export interface Affix { bucket: Bucket; value: number; label?: string; }
 export interface Slot {
   id: string;
   name: string;
+  text: string;
   weaponTypeId?: string;
   affixes: Affix[];
 }
 
 export const DEFAULT_SLOTS: Slot[] = [
-  { id: 'helm',    name: 'Helm',    affixes: [] },
-  { id: 'chest',   name: 'Chest',   affixes: [] },
-  { id: 'pants',   name: 'Pants',   affixes: [] },
-  { id: 'boots',   name: 'Boots',   affixes: [] },
-  { id: 'gloves',  name: 'Gloves',  affixes: [] },
-  { id: 'amulet',  name: 'Amulet',  affixes: [] },
-  { id: 'ring1',   name: 'Ring 1',  affixes: [] },
-  { id: 'ring2',   name: 'Ring 2',  affixes: [] },
-  { id: 'wep1',    name: 'Weapon 1', weaponTypeId: 'none', affixes: [] },
-  { id: 'wep2',    name: 'Weapon 2', weaponTypeId: 'none', affixes: [] },
-  { id: 'wep3',    name: 'Weapon 3', weaponTypeId: 'none', affixes: [] },
-  { id: 'wep4',    name: 'Weapon 4', weaponTypeId: 'none', affixes: [] },
+  { id: 'helm', name: 'Helm', text: "头盔", affixes: [] },
+  { id: 'chest', name: 'Chest', text: "胸甲", affixes: [] },
+  { id: 'pants', name: 'Pants', text: "裤子", affixes: [] },
+  { id: 'boots', name: 'Boots', text: "鞋子", affixes: [] },
+  { id: 'gloves', name: 'Gloves', text: "护手", affixes: [] },
+  { id: 'amulet', name: 'Amulet', text: "护身符", affixes: [] },
+  { id: 'ring1', name: 'Ring 1', text: "戒指 1", affixes: [] },
+  { id: 'ring2', name: 'Ring 2', text: "戒指 2", affixes: [] },
+  { id: 'wep1', name: 'Weapon 1', text: "武器 1", weaponTypeId: 'none', affixes: [] },
+  { id: 'wep2', name: 'Weapon 2', text: "武器 2", weaponTypeId: 'none', affixes: [] },
+  { id: 'wep3', name: 'Weapon 3', text: "武器 3", weaponTypeId: 'none', affixes: [] },
+  { id: 'wep4', name: 'Weapon 4', text: "武器 4", weaponTypeId: 'none', affixes: [] },
   // Catch-all for anything that contributes to a named bucket without being on equipped armor/jewelry/weapons.
-  { id: 'paragon', name: 'Paragon Nodes (legendary / rare / magic)', affixes: [] },
+  { id: 'paragon', name: 'Paragon Nodes (legendary / rare / magic)', text: "巅峰节点（普通 / 魔法 / 传奇）", affixes: [] },
   // Charm slots: 6 generic charms + 1 horadric seal
-  { id: 'charm1',  name: 'Charm 1', affixes: [] },
-  { id: 'charm2',  name: 'Charm 2', affixes: [] },
-  { id: 'charm3',  name: 'Charm 3', affixes: [] },
-  { id: 'charm4',  name: 'Charm 4', affixes: [] },
-  { id: 'charm5',  name: 'Charm 5', affixes: [] },
-  { id: 'charm6',  name: 'Charm 6', affixes: [] },
-  { id: 'seal',    name: 'Horadric Seal', affixes: [] },
-  { id: 'setBonus', name: 'Set Bonus', affixes: [] },
+  { id: 'charm1', name: 'Charm 1', text: "神符 1", affixes: [] },
+  { id: 'charm2', name: 'Charm 2', text: "神符 2", affixes: [] },
+  { id: 'charm3', name: 'Charm 3', text: "神符 3", affixes: [] },
+  { id: 'charm4', name: 'Charm 4', text: "神符 4", affixes: [] },
+  { id: 'charm5', name: 'Charm 5', text: "神符 5", affixes: [] },
+  { id: 'charm6', name: 'Charm 6', text: "神符 6", affixes: [] },
+  { id: 'seal', name: 'Horadric Seal', text: "赫拉迪姆封印", affixes: [] },
+  { id: 'setBonus', name: 'Set Bonus', text: "套装奖励", affixes: [] },
   // Glyphs (5 max for Paladin/most classes)
-  { id: 'glyph1',  name: 'Glyph 1', affixes: [] },
-  { id: 'glyph2',  name: 'Glyph 2', affixes: [] },
-  { id: 'glyph3',  name: 'Glyph 3', affixes: [] },
-  { id: 'glyph4',  name: 'Glyph 4', affixes: [] },
-  { id: 'glyph5',  name: 'Glyph 5', affixes: [] },
+  { id: 'glyph1', name: 'Glyph 1', text: "雕文 1", affixes: [] },
+  { id: 'glyph2', name: 'Glyph 2', text: "雕文 2", affixes: [] },
+  { id: 'glyph3', name: 'Glyph 3', text: "雕文 3", affixes: [] },
+  { id: 'glyph4', name: 'Glyph 4', text: "雕文 4", affixes: [] },
+  { id: 'glyph5', name: 'Glyph 5', text: "雕文 5", affixes: [] },
 ];
 
 // ---- Additive lines (matches in-game UI order) ----
@@ -132,11 +133,11 @@ const ifElites = (s: ScenarioConditions) => !!s.elites;
 
 // Note: in-game order. (No imbuement: it's a Rogue-only line and users can add it via Extra Additive.)
 export const DEFAULT_ADDITIVE_LINES: AdditiveLine[] = [
-  { id: 'crit',         label: 'Critical Strike Damage', value: 0, applies: ifCrit, isCritOnly: true },
-  { id: 'vulnerable',   label: 'Vulnerable Damage',      value: 0, applies: ifVuln },
-  { id: 'all',          label: 'All Damage',             value: 0, applies: alwaysOn },
-  { id: 'primaryElem',  label: 'Damage with [Element]',  value: 0, applies: alwaysOn },
-  { id: 'elites',       label: 'Damage vs Elites',       value: 0, applies: ifElites },
+  { id: 'crit', label: '暴击伤害', value: 0, applies: ifCrit, isCritOnly: true },
+  { id: 'vulnerable', label: '易伤伤害', value: 0, applies: ifVuln },
+  { id: 'all', label: '全域伤害', value: 0, applies: alwaysOn },
+  { id: 'primaryElem', label: '[元素]伤害', value: 0, applies: alwaysOn },
+  { id: 'elites', label: '对精英怪造成的伤害', value: 0, applies: ifElites },
 ];
 
 // Helper that clones default lines without losing function fields (structuredClone can't clone functions)
@@ -250,7 +251,7 @@ export function calc(b: Build): Calc {
   }
 
   const csdm = 1 + sumAffixes(b.slots, 'CSDM');
-  const vdm  = 1 + sumAffixes(b.slots, 'VDM');
+  const vdm = 1 + sumAffixes(b.slots, 'VDM');
   const dotm = 1 + sumAffixes(b.slots, 'DOTM');
   // Per Avarilyn's sheet: weapon gems sum INTO the ALLM bucket, not ADDITIVE.
   const allm = 1 + sumAffixes(b.slots, 'ALLM') + sumAffixes(b.slots, 'NONPHYS') + sumAffixes(b.slots, 'GEM');
@@ -287,7 +288,7 @@ export function additiveForScenario(b: Build, conditions: ScenarioConditions): n
 }
 
 export function critOnlyAdditive(b: Build): number {
-  // CRITADD bucket from gear + Critical Strike Damage line from naked baseline
+  // CRITADD bucket from gear + 暴击伤害 line from naked baseline
   let add = sumAffixes(b.slots, 'CRITADD');
   for (const l of b.additiveLines) if (l.isCritOnly) add += l.value;
   return add;
@@ -340,35 +341,35 @@ export function weightFor(b: Build, bucket: Bucket, typical: number, scenario: S
 
 // ---- Bucket display ----
 export const BUCKET_META: Record<Bucket, { label: string; isPercent: boolean; typicalRoll: number }> = {
-  CSDM:         { label: 'x% Critical Strike Damage Multiplier',  isPercent: true,  typicalRoll: 0.10 },
-  VDM:          { label: 'x% Vulnerable Damage Multiplier',       isPercent: true,  typicalRoll: 0.10 },
-  DOTM:         { label: 'x% Damage Over Time Multiplier',        isPercent: true,  typicalRoll: 0.10 },
-  ALLM:         { label: 'x% All / Element Damage Multiplier',    isPercent: true,  typicalRoll: 0.10 },
-  NONPHYS:      { label: 'x% Non-Physical Damage',                isPercent: true,  typicalRoll: 0.10 },
-  ADDITIVE:     { label: 'Custom [+]%',           isPercent: true,  typicalRoll: 0.10 },
-  CRITADD:      { label: '+% Critical Strike Damage',             isPercent: true,  typicalRoll: 0.10 },
-  MAINSTAT:     { label: '+ Main Stat (Str/Dex/Int/Will)',        isPercent: false, typicalRoll: 200 },
-  MAINSTAT_PCT: { label: 'x% Main Stat Multiplier',               isPercent: true,  typicalRoll: 0.10 },
-  WEPDMG:       { label: '+ Weapon Damage',                       isPercent: false, typicalRoll: 196 },
-  WEPDMG_PCT:   { label: 'x% Weapon Damage (e.g. shield bonus)',  isPercent: true,  typicalRoll: 1.0 },
-  GEM:          { label: 'Weapon Gem (sums into All / Element)',  isPercent: true,  typicalRoll: 0.10 },
-  CRITCHANCE:   { label: '+% Critical Strike Chance',             isPercent: true,  typicalRoll: 0.10 },
-  SKILLRANK:    { label: '+ Skill Ranks',                         isPercent: false, typicalRoll: 5 },
-  EXTRAMULT:    { label: 'Custom [x]%', isPercent: true, typicalRoll: 0.10 },
+  CSDM: { label: 'x% 暴击伤害倍增', isPercent: true, typicalRoll: 0.10 },
+  VDM: { label: 'x% 易伤伤害倍增', isPercent: true, typicalRoll: 0.10 },
+  DOTM: { label: 'x% 持续伤害倍增', isPercent: true, typicalRoll: 0.10 },
+  ALLM: { label: 'x% 全伤害 / 元素伤害倍增', isPercent: true, typicalRoll: 0.10 },
+  NONPHYS: { label: 'x% 非武器伤害', isPercent: true, typicalRoll: 0.10 },
+  ADDITIVE: { label: '其它 [+]%', isPercent: true, typicalRoll: 0.10 },
+  CRITADD: { label: '+% 暴击伤害', isPercent: true, typicalRoll: 0.10 },
+  MAINSTAT: { label: '+ 主要属性 (力量/智力/敏捷/意力)', isPercent: false, typicalRoll: 200 },
+  MAINSTAT_PCT: { label: 'x% 属性倍增', isPercent: true, typicalRoll: 0.10 },
+  WEPDMG: { label: '+ 武器伤害', isPercent: false, typicalRoll: 196 },
+  WEPDMG_PCT: { label: 'x% 武器伤害 (例如：盾牌加成)', isPercent: true, typicalRoll: 1.0 },
+  GEM: { label: '武器宝石（总和为所有属性/元素属性）', isPercent: true, typicalRoll: 0.10 },
+  CRITCHANCE: { label: '+% 暴击几率', isPercent: true, typicalRoll: 0.10 },
+  SKILLRANK: { label: '+ 技能等级', isPercent: false, typicalRoll: 5 },
+  EXTRAMULT: { label: '其它 [x]% 倍增', isPercent: true, typicalRoll: 0.10 },
 };
 
-export const BUCKET_ORDER: Bucket[] = ['CSDM','VDM','DOTM','ALLM','NONPHYS','ADDITIVE','CRITADD','MAINSTAT','MAINSTAT_PCT','WEPDMG','WEPDMG_PCT','GEM','CRITCHANCE','SKILLRANK','EXTRAMULT'];
+export const BUCKET_ORDER: Bucket[] = ['CSDM', 'VDM', 'DOTM', 'ALLM', 'NONPHYS', 'ADDITIVE', 'CRITADD', 'MAINSTAT', 'MAINSTAT_PCT', 'WEPDMG', 'WEPDMG_PCT', 'GEM', 'CRITCHANCE', 'SKILLRANK', 'EXTRAMULT'];
 
 export function presetScenarios(): Scenario[] {
   return [
-    { id: 'plain',     label: 'Plain hit (average w/ crit)',    conditions: {} },
-    { id: 'vuln',      label: 'vs Vulnerable',              conditions: { vulnerable: true } },
-    { id: 'elite',     label: 'vs Elite',                   conditions: { elites: true } },
-    { id: 'vuln_elite',label: 'vs Vulnerable Elite',        conditions: { vulnerable: true, elites: true } },
-    { id: 'cc',        label: 'vs Crowd-Controlled',        conditions: { cc: true } },
-    { id: 'healthy',   label: 'vs Healthy',                 conditions: { healthy: true } },
-    { id: 'distant',   label: 'vs Distant',                 conditions: { distant: true } },
-    { id: 'close',     label: 'vs Close',                   conditions: { close: true } },
-    { id: 'dot',       label: 'DoT tick',                   conditions: {}, isDot: true },
+    { id: 'plain', label: 'Plain hit (average w/ crit)', conditions: {} },
+    { id: 'vuln', label: 'vs Vulnerable', conditions: { vulnerable: true } },
+    { id: 'elite', label: 'vs Elite', conditions: { elites: true } },
+    { id: 'vuln_elite', label: 'vs Vulnerable Elite', conditions: { vulnerable: true, elites: true } },
+    { id: 'cc', label: 'vs Crowd-Controlled', conditions: { cc: true } },
+    { id: 'healthy', label: 'vs Healthy', conditions: { healthy: true } },
+    { id: 'distant', label: 'vs Distant', conditions: { distant: true } },
+    { id: 'close', label: 'vs Close', conditions: { close: true } },
+    { id: 'dot', label: 'DoT tick', conditions: {}, isDot: true },
   ];
 }

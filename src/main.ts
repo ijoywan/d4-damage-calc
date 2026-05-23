@@ -153,14 +153,14 @@ function renderHeader() {
 // ---------- Card 1: Baseline Stats (class + skill + stats sheet numbers) ----------
 function nakedBaselineCard() {
   const cls = classFor(build);
-  const card = sectionCard('Baseline Stats', 'Strip all gear (armor, jewelry, weapons, charms, seal) so the numbers below reflect only your level / paragon contribution. Re-equip after you copy the stats sheet values.');
+  const card = sectionCard('基础属性', '脱下所有装备（盔甲、首饰、武器、护符、封印），让下面的数值仅反映你的等级/巅峰贡献值。复制属性表数值后重新穿上装备。');
 
   // Class + skill inputs live at the top, since the user has to be naked to read both these and the stats-sheet numbers below.
   const topGrid = el('div', { class: 'grid grid-cols-2 gap-3 mb-3' });
 
   const classSel = el('select', { class: inputCls() + ' w-full' }) as HTMLSelectElement;
   for (const c of CLASSES) {
-    const opt = el('option', { value: c.id }, `${c.id} (${c.mainStat})`);
+    const opt = el('option', { value: c.id }, `${c.text}`);
     if (c.id === build.classId) opt.setAttribute('selected', '');
     classSel.append(opt);
   }
@@ -177,21 +177,21 @@ function nakedBaselineCard() {
     persist(build);
     mount();
   });
-  topGrid.append(field('Class', classSel));
-  topGrid.append(field('Skill Damage % at rank 1 (e.g. 115 for Blessed Hammer)', pctInput(() => build.skillDamagePct, v => build.skillDamagePct = v, { step: 1, w: 'w-full' })));
-  topGrid.append(field('Skill Ranks (naked, usually 15)', numInput(() => build.totalSkillRanks, v => build.totalSkillRanks = v, { w: 'w-full' })));
-  topGrid.append(field(`${cls.mainStat} (naked, no gear/charms)`, numInput(() => build.baseMainStat, v => build.baseMainStat = v, { w: 'w-full' })));
+  topGrid.append(field('职业', classSel));
+  topGrid.append(field('1 级技能伤害百分比（例如：祝福之锤为 115% ）', pctInput(() => build.skillDamagePct, v => build.skillDamagePct = v, { step: 1, w: 'w-full' })));
+  topGrid.append(field('技能等级（原始的,  通常为 15 ）', numInput(() => build.totalSkillRanks, v => build.totalSkillRanks = v, { w: 'w-full' })));
+  topGrid.append(field(`${cls.mainStatText} （原始的, 无任何装备/饰品）`, numInput(() => build.baseMainStat, v => build.baseMainStat = v, { w: 'w-full' })));
   card.append(topGrid);
 
   // Replace the long single-paragraph subtitle with bullet steps + a reference screenshot
   const help = el('details', { class: 'mb-3 text-xs text-zinc-400' });
-  const summary = el('summary', { class: 'cursor-pointer text-zinc-300 select-none' }, '⚠️ Getting the right numbers from the stats sheet');
+  const summary = el('summary', { class: 'cursor-pointer text-zinc-300 select-none' }, '⚠️ 从属性面板种获取正确的数值');
   help.append(summary);
   const body = el('div', { class: 'mt-2 grid sm:grid-cols-[1fr_auto] gap-3 items-start' });
   const steps = el('ol', { class: 'list-decimal list-inside space-y-1 text-zinc-400' });
   steps.append(
-    el('li', {}, 'Strip ', el('strong', { class: 'text-zinc-200' }, 'all'), ' gear (and charms / Horadric Seal). You want pure paragon contribution.'),
-    el('li', {}, 'Open the ', el('strong', { class: 'text-zinc-200' }, 'Stats Sheet'), ' (press the ', el('em', { class: 'text-amber-300' }, 'Stats & Materials'), ' button) and switch to the ', el('strong', { class: 'text-zinc-200' }, 'Offensive'), ' tab.'),
+    el('li', {}, '忽略 ', el('strong', { class: 'text-zinc-200' }, '所有的 '), '装备（以及神符/赫拉迪姆封印）。你需要的是原始的巅峰等级贡献。'),
+    el('li', {}, '打开', el('strong', { class: 'text-zinc-200' }, '属性面板'), ' (点击 ', el('em', { class: 'text-amber-300' }, '属性 & 材料'), ' 按钮) 然后跳转到', el('strong', { class: 'text-zinc-200' }, '伤害'), '标签.'),
     el('li', {}, 'Hover each line. The tooltip has a ', el('strong', { class: 'text-zinc-200' }, 'top'), ' (visible) number and a ', el('strong', { class: 'text-zinc-200' }, 'bottom'), ' line: ',
       el('em', { class: 'text-amber-300' }, '“You have +X% of this stat from items and Paragon.”'),
       ' Copy the bottom number.'),
@@ -210,7 +210,7 @@ function nakedBaselineCard() {
   // so the inputs all line up consistently.
   const grid = el('div', { class: 'grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2' });
   const critRow = el('div', { class: 'flex items-center gap-2' });
-  critRow.append(el('div', { class: 'flex-1 text-xs text-zinc-400' }, 'Critical Strike Chance'));
+  critRow.append(el('div', { class: 'flex-1 text-xs text-zinc-400' }, '暴击几率'));
   critRow.append(pctInput(() => build.baseCritChance, v => build.baseCritChance = v, { w: 'w-24', step: 0.5 }));
   critRow.append(el('span', { class: 'text-zinc-600 text-xs' }, '%'));
   grid.append(critRow);
@@ -267,9 +267,9 @@ function slotsCard() {
 }
 
 function charmsCard() {
-  const card = sectionCard('Charms, Seal & Set Bonus',
-    '6 charm slots, the Horadric Seal, and a dedicated Set Bonus row. Each carries affixes that go into damage buckets. For set bonuses (e.g., 5pc Disciple x500% damage), use the Custom [x]% bucket on the Set Bonus row so it isn\u2019t tied to a specific charm.');
-  const order = ['charm1','charm2','charm3','charm4','charm5','charm6','seal','setBonus'];
+  const card = sectionCard('神符、封印和套装奖励',
+    '6 个神符插槽, 赫拉迪姆封印，以及专属的套装奖励词缀。它们各自带有词缀，这些词缀会累积到伤害槽中。 对于套装奖励（例如，5 件套门徒套装 x500% 伤害，在套装奖励行中使用 “其它 [x]%” 桶，这样它就不会与特定的神符绑定。');
+  const order = ['charm1', 'charm2', 'charm3', 'charm4', 'charm5', 'charm6', 'seal', 'setBonus'];
   for (const id of order) {
     const slot = build.slots.find(s => s.id === id);
     if (slot) card.append(slotBlock(slot));
@@ -280,7 +280,7 @@ function charmsCard() {
 function glyphsCard() {
   const card = sectionCard('Glyph Sockets (5 max)',
     'Each glyph has up to 3 sources of damage: the additive bonus (top), additional bonus (often conditional, ignore if not steady-state), and the legendary bonus (bottom). Enter ONLY the legendary bonus here. The additive parts are already in the Baseline Stats card above.');
-  const order = ['glyph1','glyph2','glyph3','glyph4','glyph5'];
+  const order = ['glyph1', 'glyph2', 'glyph3', 'glyph4', 'glyph5'];
   for (const id of order) {
     const slot = build.slots.find(s => s.id === id);
     if (slot) card.append(slotBlock(slot));
@@ -303,12 +303,12 @@ const CLASS_HINTS: Record<string, string> = {
 };
 
 function paragonContributionsCard() {
-  const card = sectionCard('Other Buffs & Multipliers',
-    'Anything that contributes damage outside of gear, charms, glyphs, and the stats sheet. Skills, paragon nodes, key passives, class mechanics, auras, sacrifices, and similar. Add one row per source. Skip anything whose % already shows up on the stats sheet, it\u2019s already counted above.');
+  const card = sectionCard('其它增益和倍增',
+    '任何除装备、神符、雕文和属性面板之外的伤害来源。例如技能、巅峰天赋点、关键被动技能、职业机制、光环、献祭等等。每个来源增加一行。属性面板上已经显示百分比的伤害来源可以跳过，因为它们已经在上面计算过了。');
   const hint = CLASS_HINTS[build.classId];
   if (hint) {
     card.append(el('p', { class: 'text-xs text-zinc-500 -mt-2 mb-3' },
-      el('span', { class: 'text-zinc-400' }, `Common sources for ${build.classId}:`),
+      el('span', { class: 'text-zinc-400' }, `${build.classId} 的常见来源 :`),
       ' ', hint));
   }
   const slot = build.slots.find(s => s.id === 'paragon');
@@ -327,8 +327,8 @@ function slotBlock(slot: Slot) {
   const isArmorGemSlotEarly = (new Set(['helm', 'chest', 'pants'])).has(slot.id);
   if (isEmpty && !isWeapon && !isParagon && !isArmorGemSlotEarly) {
     const row = el('div', { class: 'flex items-center justify-between gap-3 py-1.5 px-3 mb-1 border border-zinc-800/60 rounded text-sm hover:border-zinc-700 transition-colors' });
-    row.append(el('span', { class: 'text-zinc-500' }, slot.name));
-    const addBtn = el('button', { class: 'text-xs text-amber-400 hover:text-amber-300 px-2 py-0.5 rounded border border-amber-700/50' }, '+ Add Affix');
+    row.append(el('span', { class: 'text-zinc-500' }, slot.text));
+    const addBtn = el('button', { class: 'text-xs text-amber-400 hover:text-amber-300 px-2 py-0.5 rounded border border-amber-700/50' }, '+ 添加词缀');
     addBtn.addEventListener('click', () => { slot.affixes.push({ bucket: 'CSDM', value: 0 }); mount(); });
     row.append(addBtn);
     return row;
@@ -337,7 +337,7 @@ function slotBlock(slot: Slot) {
   const wrap = el('div', { class: 'border border-zinc-800 rounded-lg p-3 mb-2' });
 
   const header = el('div', { class: 'flex items-center gap-3 mb-2 flex-wrap' });
-  if (!isParagon) header.append(el('h3', { class: 'font-semibold text-zinc-200 mr-auto' }, slot.name));
+  if (!isParagon) header.append(el('h3', { class: 'font-semibold text-zinc-200 mr-auto' }, slot.text));
   else header.append(el('span', { class: 'mr-auto' }));
 
   if (isWeapon) {
@@ -357,14 +357,14 @@ function slotBlock(slot: Slot) {
       const dmgChip = el('span', {
         class: 'text-xs text-zinc-400 px-2 py-1 rounded bg-zinc-900 border border-zinc-800 whitespace-nowrap',
         title: overrides !== 0
-          ? `Base ${wt.baseDamage.toLocaleString()} + ${overrides >= 0 ? '+' : ''}${overrides.toLocaleString()} from + Weapon Damage affix(es) below`
-          : `Built-in baseline for ${wt.label}. Add a “+ Weapon Damage” affix below to override.`,
-      }, `${total.toLocaleString()} dmg`);
+          ? `Base ${wt.baseDamage.toLocaleString()} + ${overrides >= 0 ? '+' : ''}${overrides.toLocaleString()} from + 武器伤害 affix(es) below`
+          : `Built-in baseline for ${wt.label}. Add a “+ 武器伤害” affix below to override.`,
+      }, `${total.toLocaleString()} 伤害`);
       header.append(dmgChip);
     }
   }
 
-  const addBtn = el('button', { class: 'text-xs text-amber-400 hover:text-amber-300 px-2 py-1 rounded border border-amber-700/50' }, '+ Add Affix');
+  const addBtn = el('button', { class: 'text-xs text-amber-400 hover:text-amber-300 px-2 py-1 rounded border border-amber-700/50' }, '+ 添加词缀');
   addBtn.addEventListener('click', () => { slot.affixes.push({ bucket: 'CSDM', value: 0 }); mount(); });
   header.append(addBtn);
   wrap.append(header);
@@ -383,7 +383,7 @@ function slotBlock(slot: Slot) {
   const gemLabels = isArmorGemSlot
     ? ARMOR_GEM_LABELS
     : isWeaponGemSlot ? WEAPON_GEM_LABELS.slice(0, weaponSockets)
-    : [];
+      : [];
 
   // (Removed weaponAvgDamage input. The hardcoded baseline + WEPDMG affix already matches the in-game tooltip.)
 
@@ -403,7 +403,7 @@ function slotBlock(slot: Slot) {
     isWeaponGemSlot && a.bucket === 'GEM' && !WEAPON_GEM_LABELS.includes(a.label ?? '');
   const visibleAffixes = slot.affixes.map((a, i) => ({ a, i })).filter(({ a }) => !isHiddenGemAffix(a) && !isLegacyWeaponGem(a));
 
-  if (visibleAffixes.length === 0) wrap.append(el('p', { class: 'text-xs text-zinc-600 italic' }, 'No affixes.'));
+  if (visibleAffixes.length === 0) wrap.append(el('p', { class: 'text-xs text-zinc-600 italic' }, '无词缀。'));
 
   visibleAffixes.forEach(({ a, i: idx }) => {
     const row = el('div', { class: 'flex flex-wrap sm:flex-nowrap gap-2 mb-1.5 items-center min-w-0' });
@@ -433,7 +433,7 @@ function slotBlock(slot: Slot) {
     // Sits between the bucket dropdown and the value so it shares the row instead of wrapping below.
     const labelable = a.bucket === 'EXTRAMULT' || a.bucket === 'ADDITIVE' || a.bucket === 'MAINSTAT_PCT' || a.bucket === 'GEM';
     if (labelable) {
-      row.append(textInput(() => a.label ?? '', v => { a.label = v; }, { w: 'w-full sm:flex-1 min-w-0', placeholder: 'Optional label (e.g. “Heir of Perdition”)' }));
+      row.append(textInput(() => a.label ?? '', v => { a.label = v; }, { w: 'w-full sm:flex-1 min-w-0', placeholder: '可选的标签 (例如：“堕狱传承”)' }));
     }
 
     // Number input + unit suffix as a fixed-width pair so percent and non-percent rows align.
@@ -472,24 +472,24 @@ function slotBlock(slot: Slot) {
       const cb = el('input', { type: 'checkbox', class: 'accent-amber-500' }) as HTMLInputElement;
       cb.checked = !!findGem();
       gemRow.append(cb);
-      gemRow.append(el('span', { class: 'text-zinc-400 w-12' }, 'Gem'));
+      gemRow.append(el('span', { class: 'text-zinc-400 w-12' }, '宝石'));
 
       // Inline number + descriptor. Match the in-game tooltip format:
       //   armor:  "+90 Strength"
-      //   weapon: "x24% Element Damage Multiplier"
+      //   weapon: "x24% 元素伤害倍增"
       const prefix = el('span', { class: 'text-zinc-500 text-sm' }, isArmor ? '+' : 'x');
       const input = (isArmor
         ? numInput(
-            () => findGem()?.value ?? lastValue,
-            v => { lastValue = v; const g = findGem(); if (g) g.value = v; },
-            { w: 'w-16 text-right' })
+          () => findGem()?.value ?? lastValue,
+          v => { lastValue = v; const g = findGem(); if (g) g.value = v; },
+          { w: 'w-16 text-right' })
         : pctInput(
-            () => findGem()?.value ?? lastValue,
-            v => { lastValue = v; const g = findGem(); if (g) g.value = v; },
-            { w: 'w-16 text-right' })) as HTMLInputElement;
+          () => findGem()?.value ?? lastValue,
+          v => { lastValue = v; const g = findGem(); if (g) g.value = v; },
+          { w: 'w-16 text-right' })) as HTMLInputElement;
       const suffix = el('span', { class: 'text-zinc-400 text-sm' }, isArmor
-        ? cls.mainStat
-        : '% Element Damage Multiplier');
+        ? cls.mainStatText
+        : '% 元素伤害倍增');
       gemRow.append(prefix, input, suffix);
 
       const applyDisabled = () => {
@@ -530,18 +530,18 @@ function slotBlock(slot: Slot) {
 const scenarioState = { vulnerable: true, elites: true, close: false, distant: false, cc: false, healthy: false };
 
 function scenariosCard() {
-  const card = sectionCard('Damage');
+  const card = sectionCard('伤害');
   const c = calc(build);
   if (c.weaponDmg === 0) {
-    card.append(el('p', { class: 'text-xs text-amber-400' }, '⚠️ Pick a weapon type in your weapon slot to enable damage output.'));
+    card.append(el('p', { class: 'text-xs text-amber-400' }, '⚠️ 需要在武器栏中选择一种武器类型才能显示伤害。'));
     return card;
   }
 
   // Conditional toggles
   const toggleWrap = el('div', { class: 'flex flex-wrap gap-x-3 gap-y-1 mb-3' });
   const toggles: { key: keyof typeof scenarioState; label: string }[] = [
-    { key: 'vulnerable', label: 'Vulnerable' },
-    { key: 'elites',     label: 'Elite' },
+    { key: 'vulnerable', label: '易伤伤害' },
+    { key: 'elites', label: '对精英的伤害' },
   ];
   for (const t of toggles) {
     const lbl = el('label', { class: 'flex items-center gap-1 text-xs text-zinc-400 cursor-pointer' });
@@ -557,18 +557,18 @@ function scenariosCard() {
 
   // Compute scenarios
   const conds = { ...scenarioState };
-  const scenarioHit: any = { id: 'hit',  label: 'hit',  conditions: conds };
+  const scenarioHit: any = { id: 'hit', label: 'hit', conditions: conds };
   const hitDmg = scenarioDamageNoCrit(build, scenarioHit);
   const critDmg = scenarioCritOnly(build, scenarioHit);
 
   // Big readout (matches in-game: white = hit, yellow = crit)
   const row = el('div', { class: 'grid grid-cols-2 gap-3 mb-1' });
   row.append(el('div', { class: 'text-center' },
-    el('div', { class: 'text-xs text-zinc-500' }, 'Hit'),
+    el('div', { class: 'text-xs text-zinc-500' }, '击中伤害'),
     el('div', { class: 'text-2xl font-bold text-zinc-100 font-mono' }, fmtBigNum(hitDmg)),
   ));
   row.append(el('div', { class: 'text-center' },
-    el('div', { class: 'text-xs text-zinc-500' }, 'Crit'),
+    el('div', { class: 'text-xs text-zinc-500' }, '暴击伤害'),
     el('div', { class: 'text-2xl font-bold text-amber-400 font-mono' }, fmtBigNum(critDmg)),
   ));
   card.append(row);
@@ -576,7 +576,7 @@ function scenariosCard() {
   {
     const avg = critDmg * c.critChance + hitDmg * (1 - c.critChance);
     card.append(el('div', { class: 'text-center text-sm text-zinc-300 mt-1.5' },
-      el('span', { class: 'text-xs text-zinc-500' }, `Average @ ${(c.critChance*100).toFixed(1)}% crit → `),
+      el('span', { class: 'text-xs text-zinc-500' }, `平均 @ ${(c.critChance * 100).toFixed(1)}% 暴击 → `),
       el('span', { class: 'text-zinc-100 font-mono font-semibold' }, fmtBigNum(avg)),
     ));
   }
@@ -607,7 +607,7 @@ function scenarioCritOnly(b: Build, scenario: any): number {
 
 // ---------- OUTPUT: Buckets ----------
 function bucketsCard() {
-  const card = sectionCard('Upgrade Priority');
+  const card = sectionCard('提升优先级');
 
   const c = calc(build);
   if (c.weaponDmg === 0) {
@@ -620,25 +620,25 @@ function bucketsCard() {
   const cls = classFor(build);
   type Row = { affix: string; gain: number; warn?: string };
   const rows: Row[] = [
-    { affix: 'x10% Critical Strike Damage Multiplier', gain: weightFor(build, 'CSDM', 0.10, refScenario) },
-    { affix: 'x10% Vulnerable Damage Multiplier',      gain: weightFor(build, 'VDM', 0.10, refScenario) },
-    { affix: 'x10% All / Element Damage Multiplier',   gain: weightFor(build, 'ALLM', 0.10, refScenario) },
-    { affix: '+10% Critical Strike Damage',            gain: weightFor(build, 'CRITADD', 0.10, refScenario) },
-    { affix: '+10% Damage (additive)',                 gain: weightFor(build, 'ADDITIVE', 0.10, refScenario) },
-    { affix: `+100 ${cls.mainStat}`,                   gain: weightFor(build, 'MAINSTAT', 100, refScenario) },
-    { affix: `x10% ${cls.mainStat} Multiplier`,        gain: weightFor(build, 'MAINSTAT_PCT', 0.10, refScenario) },
-    { affix: '+5% Critical Strike Chance',             gain: weightFor(build, 'CRITCHANCE', 0.05, refScenario), warn: c.critChance >= 1 ? 'capped' : undefined },
-    { affix: '+100 Weapon Damage',                     gain: weightFor(build, 'WEPDMG', 100, refScenario) },
-    { affix: 'x10% Weapon Damage',                     gain: weightFor(build, 'WEPDMG_PCT', 0.10, refScenario) },
-    { affix: '+3 Skill Ranks',                         gain: weightFor(build, 'SKILLRANK', 3, refScenario) },
+    { affix: 'x10% 暴击伤害倍增', gain: weightFor(build, 'CSDM', 0.10, refScenario) },
+    { affix: 'x10% 易伤伤害倍增', gain: weightFor(build, 'VDM', 0.10, refScenario) },
+    { affix: 'x10% 全伤害 / 元素伤害倍增', gain: weightFor(build, 'ALLM', 0.10, refScenario) },
+    { affix: '+10% 暴击伤害', gain: weightFor(build, 'CRITADD', 0.10, refScenario) },
+    { affix: '+10% 伤害 (额外的)', gain: weightFor(build, 'ADDITIVE', 0.10, refScenario) },
+    { affix: `+100 ${cls.mainStatText}`, gain: weightFor(build, 'MAINSTAT', 100, refScenario) },
+    { affix: `x10% ${cls.mainStatText} 倍增`, gain: weightFor(build, 'MAINSTAT_PCT', 0.10, refScenario) },
+    { affix: '+5% 暴击几率', gain: weightFor(build, 'CRITCHANCE', 0.05, refScenario), warn: c.critChance >= 1 ? 'capped' : undefined },
+    { affix: '+100 武器伤害', gain: weightFor(build, 'WEPDMG', 100, refScenario) },
+    { affix: 'x10% 武器伤害', gain: weightFor(build, 'WEPDMG_PCT', 0.10, refScenario) },
+    { affix: '+3 技能等级', gain: weightFor(build, 'SKILLRANK', 3, refScenario) },
   ];
   rows.sort((a, b) => b.gain - a.gain);
 
   const table = el('table', { class: 'w-full text-sm' });
   table.append(el('thead', {},
     el('tr', { class: 'text-xs uppercase tracking-wide text-zinc-500 border-b border-zinc-800' },
-      el('th', { class: 'text-left py-1 font-normal' }, 'Affix'),
-      el('th', { class: 'text-right py-1 font-normal whitespace-nowrap pl-2' }, 'Damage Gain'),
+      el('th', { class: 'text-left py-1 font-normal' }, '词缀'),
+      el('th', { class: 'text-right py-1 font-normal whitespace-nowrap pl-2' }, '伤害增益'),
     ),
   ));
   const tb = el('tbody');
@@ -659,11 +659,11 @@ function bucketsCard() {
   // "Why some affixes are worth more than others" at the bottom. Collapsed by default now
   // that the table itself is the primary content.
   card.append(el('details', { class: 'mt-4 text-xs text-zinc-500' },
-    el('summary', { class: 'cursor-pointer text-zinc-400 select-none' }, 'Why some affixes are worth more than others'),
+    el('summary', { class: 'cursor-pointer text-zinc-400 select-none' }, '为什么有些词缀比其它词缀更有提升价值'),
     el('div', { class: 'mt-2 text-zinc-400 space-y-2' },
-      el('p', {}, 'Same-named affixes ', el('strong', {}, 'sum into one bucket'), '; the bucket then multiplies into the damage formula. A small bucket gains more from a new affix than a big one.'),
-      el('p', {}, 'Example: CSDM bucket at +150% (×2.50). Adding x10% → +160% (×2.60). Damage gain = 2.60 / 2.50 = +4%. If your Vulnerable bucket only had +20% (×1.20), same +10% affix goes to ×1.30 → +8.3%, twice as good.'),
-      el('p', {}, el('strong', {}, '+ vs x: '), '“+75% Crit Damage” joins the giant additive bucket. “x56% Crit Damage Multiplier” is its own much smaller bucket. The x version is usually 3-5× more valuable in late game.'),
+      el('p', {}, '同名的词缀', el('strong', {}, '会被汇总到同一个计算桶'), '; 然后，桶的大小会影响伤害计算公式。小桶从新词缀中获得的收益比大桶更大。'),
+      el('p', {}, '例如：CSDM 桶原本有 +150%（×2.50）。增加 10% 后变为 +160%（×2.60）。伤害提升 = 2.60 / 2.50 = +4% 。如果你的易伤桶原本只有 +20%（×1.20），那么同样的 +10% 词缀变为 ×1.30 → +8.3%，效果翻倍。'),
+      el('p', {}, el('strong', {}, '+ vs x: '), '“+75% 暴击伤害” 属于一个巨大的额外伤害计算桶。 “x56% 伤害倍增” 则属于一个独立的小计算桶。 在游戏后期，x 版本通常比前者价值高出 3-5 倍。'),
     ),
   ));
 
@@ -673,7 +673,7 @@ function bucketsCard() {
 function statsCard() {
   const c = calc(build);
   const cls = classFor(build);
-  const card = sectionCard('Stats Summary');
+  const card = sectionCard('统计面板');
   // Helpers:
   //   bonus(n)  -> "+X.X%" style number for additive/bonus values (matches in-game stats sheet)
   //   ofBase(n) -> total as % of base damage (for final-factor things like Skill Damage / standalone product)
@@ -684,7 +684,7 @@ function statsCard() {
   const sumBucket = (bk: Bucket) => build.slots.reduce((s, slot) =>
     s + slot.affixes.filter(a => a.bucket === bk).reduce((ss, a) => ss + a.value, 0), 0);
 
-  // Combined +% Critical Strike Damage: Baseline Stats line + gear CRITADD bucket.
+  // Combined +% 暴击伤害: Baseline Stats line + gear CRITADD bucket.
   // Both stack into the same additive bucket on crit hits, so showing them as one row matches
   // how the calc actually uses them.
   const baselineCrit = build.additiveLines.find(l => l.id === 'crit')?.value ?? 0;
@@ -709,26 +709,26 @@ function statsCard() {
   const stats: [string, string][] = [];
 
   // --- Computed totals (raw numbers, no +/x prefix) ---
-  stats.push(['Weapon Damage', c.weaponDmg ? fmtNum(c.weaponDmg) : 'pick weapon']);
-  stats.push([cls.mainStat, fmtNum(c.mainStatSum)]);
-  stats.push(['Skill Ranks', String(c.totalSkillRanks)]);
-  stats.push(['Skill Damage', ofBase(c.skillCoef)]);
+  stats.push(['武器伤害', c.weaponDmg ? fmtNum(c.weaponDmg) : '请选择武器']);
+  stats.push([cls.mainStatText, fmtNum(c.mainStatSum)]);
+  stats.push(['技能等级', String(c.totalSkillRanks)]);
+  stats.push(['技能伤害', ofBase(c.skillCoef)]);
 
   // --- Dropdown order (matches the affix select alphabetical sort) ---
-  // + Critical Strike Chance
-  stats.push(['+% Critical Strike Chance', bonus(c.critChance, 1)]);
-  // + Critical Strike Damage (additive, baseline + gear CRITADD combined)
-  if (critDmgAdditive !== 0) stats.push(['+% Critical Strike Damage (crit only)', bonus(critDmgAdditive)]);
+  // + 暴击几率
+  stats.push(['+% 暴击几率', bonus(c.critChance, 1)]);
+  // + 暴击伤害 (additive, baseline + gear CRITADD combined)
+  if (critDmgAdditive !== 0) stats.push(['+% 暴击伤害 (仅限暴击)', bonus(critDmgAdditive)]);
   // Other +% damage lines from Baseline Stats (Vulnerable, All, Element, Elites, etc.)
   for (const r of baselineAdditiveRows) stats.push(r);
   // x% multipliers in alphabetical order (matches dropdown). Weapon gem already sums into the
   // ALLM bucket internally, so it's reflected in the All / Element row; no separate gem row needed.
-  stats.push(['x% All / Element Damage Multiplier', bonus(c.allm - 1)]);
-  stats.push(['x% Critical Strike Damage Multiplier', bonus(c.csdm - 1)]);
+  stats.push(['x% 全伤害 / 元素伤害倍增', bonus(c.allm - 1)]);
+  stats.push(['x% 暴击伤害倍增', bonus(c.csdm - 1)]);
   // DoT and Non-Physical only if relevant.
-  if (c.dotm > 1) stats.push(['x% Damage Over Time Multiplier', bonus(c.dotm - 1)]);
-  if (nonPhysSum !== 0) stats.push(['x% Non-Physical Damage', bonus(nonPhysSum)]);
-  stats.push(['x% Vulnerable Damage Multiplier', bonus(c.vdm - 1)]);
+  if (c.dotm > 1) stats.push(['x% 持续伤害倍增', bonus(c.dotm - 1)]);
+  if (nonPhysSum !== 0) stats.push(['x% 非物理伤害', bonus(nonPhysSum)]);
+  stats.push(['x% 易伤伤害倍增', bonus(c.vdm - 1)]);
 
   // --- Custom buckets last (matches dropdown order with Custom [+]% / [x]% at end) ---
   if (otherAdditive !== 0) stats.push(['Other additive damage (Custom +%)', bonus(otherAdditive)]);
@@ -747,7 +747,7 @@ function statsCard() {
 // ---------- Footer: formula card (KaTeX rendered) ----------
 function formulaCard() {
   const card = el('section', { class: 'bg-zinc-900/30 border border-zinc-800 rounded-lg p-4 sm:p-6 text-sm text-zinc-300' });
-  card.append(el('h2', { class: 'text-sm font-semibold text-zinc-300 uppercase tracking-wide mb-3' }, 'How the formula works'));
+  card.append(el('h2', { class: 'text-sm font-semibold text-zinc-300 uppercase tracking-wide mb-3' }, '伤害计算公式的细节拆分'));
   card.append(el('p', { class: 'mb-4' },
     'D4 damage is a single product of factors. Each factor (a "bucket") is either a sum of additive % values or a single multiplier. The marginal value of an affix is approximately ',
     katexInline('\\Delta / B'), ', where ', katexInline('B'), ' is the bucket\'s current value. Smaller buckets give bigger gains: at sizes ',
@@ -774,7 +774,7 @@ function formulaCard() {
     ' / ',
     Object.assign(el('a', { href: 'https://docs.google.com/spreadsheets/d/1qM6XySdTPuoCF4pEndWihBy0oONayRwZZ9WePkn_TFU/', target: '_blank', class: 'text-amber-400 hover:underline' }), { textContent: 'Original Sheet' }),
     ' \u00b7 ',
-    Object.assign(el('a', { href: 'https://github.com/jlian/d4-damage-calc', target: '_blank', class: 'text-amber-400 hover:underline' }), { textContent: 'GitHub source' }),
+    Object.assign(el('a', { href: 'https://github.com/jlian/d4-damage-calc', target: '_blank', class: 'text-amber-400 hover:underline' }), { textContent: 'GitHub 源代码' }),
     '.',
   ));
 
@@ -787,11 +787,11 @@ function additiveBreakdown(b: Build, conds: any): string {
   const parts: string[] = [];
   for (const l of b.additiveLines) {
     if (l.isCritOnly) continue;
-    if (l.applies(conds) && l.value > 0) parts.push(`${l.label} ${(l.value*100).toFixed(0)}%`);
+    if (l.applies(conds) && l.value > 0) parts.push(`${l.label} ${(l.value * 100).toFixed(0)}%`);
   }
   let slotAdd = 0;
   for (const slot of b.slots) for (const aa of slot.affixes) if (aa.bucket === 'ADDITIVE') slotAdd += aa.value;
-  if (slotAdd > 0) parts.push(`gear/extras ${(slotAdd*100).toFixed(1)}%`);
+  if (slotAdd > 0) parts.push(`gear/extras ${(slotAdd * 100).toFixed(1)}%`);
   return parts.length ? ` (sum of ${parts.join(', ')})` : '';
 }
 
@@ -834,7 +834,7 @@ function buildPluggedIn(): HTMLElement {
   const wrap = el('div', { class: 'my-4' });
   const c = calc(build);
   if (c.weaponDmg === 0) {
-    wrap.append(el('p', { class: 'text-xs text-zinc-500' }, 'Pick a weapon type to see the formula with your numbers.'));
+    wrap.append(el('p', { class: 'text-xs text-zinc-500' }, '请选择武器类型，你就能看到包含具体数值的伤害公式。'));
     return wrap;
   }
   const cls = classFor(build);
@@ -855,10 +855,10 @@ function buildPluggedIn(): HTMLElement {
   // One table: Symbol matches the formula exactly | Description (text) | math (intermediate) | result (decimal)
   const tbl = el('table', { class: 'w-full text-xs my-3 block sm:table' });
   tbl.append(el('thead', { class: 'hidden sm:table-header-group' }, el('tr', { class: 'text-xs text-zinc-500 border-b border-zinc-800' },
-    el('th', { class: 'text-left py-1 font-normal w-32' }, 'Factor'),
-    el('th', { class: 'text-left py-1 font-normal' }, 'Description'),
-    el('th', { class: 'text-right py-1 font-normal whitespace-nowrap' }, 'Math'),
-    el('th', { class: 'text-right py-1 font-normal pl-3 whitespace-nowrap' }, 'Value'),
+    el('th', { class: 'text-left py-1 font-normal w-32' }, '因子'),
+    el('th', { class: 'text-left py-1 font-normal' }, '描述'),
+    el('th', { class: 'text-right py-1 font-normal whitespace-nowrap' }, '数学公式'),
+    el('th', { class: 'text-right py-1 font-normal pl-3 whitespace-nowrap' }, '计算结果'),
   )));
   type RowDesc = string | (string | Node)[];
   type Row = [string, RowDesc, string, number];
@@ -879,7 +879,7 @@ function buildPluggedIn(): HTMLElement {
     ['W',
       wepDmgPctSum > 0
         ? ['Average weapon damage from your equipped weapon(s), boosted by any ', katexInline('+\\%'), ' weapon damage affix (e.g. Herald of Zakarum\u2019s ', katexInline('+100\\%'), ' main-hand weapon damage). Combined as ', katexInline('W_{base} \\cdot (1 + \\Sigma)'), '.']
-        : 'Average weapon damage from your equipped weapon(s).',
+        : '已装备的武器的平均武器伤害。',
       wepDmgPctSum > 0 ? `× (1 + ${dec(wepDmgPctSum)})` : '',
       c.weaponDmg],
     ['(1 + A)',
@@ -888,23 +888,23 @@ function buildPluggedIn(): HTMLElement {
         : 'Sum of all additive damage % bonuses.',
       addMath || `1 + ${dec(usedAdd)}`, 1 + usedAdd],
     [`(1 + S/${cls.divisor})`,
-      [`${cls.mainStat} multiplier. Divisor is `, katexInline(String(cls.divisor)), ` for ${build.classId} (Barbarian uses `, katexInline('900'), ', all others ', katexInline('800'), ').'],
-      `1 + ${dec(c.mainStatSum, 0)}/${cls.divisor}`, c.mainStatMult],
+    [`${cls.mainStat} multiplier. Divisor is `, katexInline(String(cls.divisor)), ` for ${build.classId} (Barbarian uses `, katexInline('900'), ', all others ', katexInline('800'), ').'],
+    `1 + ${dec(c.mainStatSum, 0)}/${cls.divisor}`, c.mainStatMult],
     ['C',
       ['Skill damage coefficient. Step formula: ', katexInline(String.raw`\text{base} \cdot \left(1 + 0.10 \cdot (N - \lfloor N/5 \rfloor - 1) + 0.15 \cdot \lfloor N/5 \rfloor\right)`), ' where ', katexInline('N'), ' = total ranks. Every multiple of 5 ranks gets a ', katexInline('+5\\%'), ' bonus on top.'],
       skillMath, c.skillCoef],
     [String.raw`\prod_i M_i`,
-      'Product of standalone aspect/unique multipliers. Each one is its own factor.',
-      extraMultMath(build), c.extraMultProduct],
+      '由各个独立因素/唯一因素的乘数相乘得到的乘积。每个因素都是一个独立的因子。',
+    extraMultMath(build), c.extraMultProduct],
   ];
   rows.push([String.raw`(1.5 \cdot M_{crit})^c`,
-    ['Crit factor: ', katexInline('1.5'), ' inherent crit baseline times the Critical Strike Damage Multiplier bucket. Active only on crit hits (', katexInline('c = 1'), ').'],
-    `1.5 × (${csdmMath})`, c.csdm * 1.5]);
+  ['暴击因数: ', katexInline('1.5'), ' inherent crit baseline times the Critical Strike Damage Multiplier bucket. Active only on crit hits (', katexInline('c = 1'), ').'],
+  `1.5 × (${csdmMath})`, c.csdm * 1.5]);
   rows.push([String.raw`(1.2 \cdot M_{vuln})^v`,
-    ['Vulnerable factor: ', katexInline('1.2'), ' inherent vuln baseline times the Vulnerable Damage Multiplier bucket. Active only against vulnerable targets (', katexInline('v = 1'), ').'],
-    conds.vulnerable ? `1.2 × (${vdmMath})` : 'inactive (v = 0)', vdmFactor]);
+  ['Vulnerable factor: ', katexInline('1.2'), ' inherent vuln baseline times the Vulnerable Damage Multiplier bucket. Active only against vulnerable targets (', katexInline('v = 1'), ').'],
+  conds.vulnerable ? `1.2 × (${vdmMath})` : 'inactive (v = 0)', vdmFactor]);
   rows.push(['M_{all}',
-    'All / Element Damage Multiplier bucket. Includes weapon gem damage which sums into this bucket.',
+    '全伤害 / 元素伤害倍增桶. 包括武器宝石伤害，这些伤害会累加到这个数值中。',
     allmMath, c.allm]);
   rows.push(['(1 - R)',
     ['Enemy damage reduction. ', katexInline('R = 0.80'), ' for a level-appropriate enemy / training dummy (80% reduction).'],
@@ -930,10 +930,10 @@ function buildPluggedIn(): HTMLElement {
   // value below is from internal full-precision math.)
   // Big result (precise, from internal full-precision math)
   wrap.append(el('div', { class: 'mt-3 pt-3 border-t border-zinc-800 flex items-baseline justify-between' },
-    el('span', { class: 'text-sm text-zinc-300' }, `Crit hit damage`),
+    el('span', { class: 'text-sm text-zinc-300' }, `暴击击中伤害`),
     el('span', { class: 'text-2xl font-bold text-amber-400 font-mono' }, fmtBigNum(critDmg)),
   ));
-  wrap.append(el('div', { class: 'text-xs text-zinc-500 mt-2' }, `Average (with ${(c.critChance*100).toFixed(0)}% crit chance) = ${fmtBigNum(avgDmg)}`));
+  wrap.append(el('div', { class: 'text-xs text-zinc-500 mt-2' }, `平均 (以 ${(c.critChance * 100).toFixed(0)}% 暴击几率计算) = ${fmtBigNum(avgDmg)}`));
   void hi; // unused helper
   return wrap;
 }
@@ -951,13 +951,13 @@ function katexBlock(tex: string): HTMLElement {
 
 // ---------- header buttons ----------
 function copyShareBtn() {
-  const btn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-amber-600 hover:bg-amber-500 text-zinc-950 font-medium', title: 'Copy a shareable link that encodes the current build' }, 'Copy Share Link');
+  const btn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-amber-600 hover:bg-amber-500 text-zinc-950 font-medium', title: 'Copy a shareable link that encodes the current build' }, '复制分享链接');
   btn.addEventListener('click', async () => {
     const url = buildShareUrl(build);
     try { await navigator.clipboard.writeText(url); }
-    catch { prompt('Copy this link:', url); }
+    catch { prompt('请复制下面的链接:', url); }
     const old = btn.textContent;
-    btn.textContent = 'Copied!';
+    btn.textContent = '复制成功!';
     setTimeout(() => { btn.textContent = old; }, 1500);
   });
   return btn;
@@ -965,11 +965,11 @@ function copyShareBtn() {
 
 function snapshotBtn() {
   if (build.snapshot) {
-    const btn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-700 hover:bg-zinc-600 text-zinc-100', title: 'Stop comparing against the snapshot (does not change current build)' }, '📌 Clear Snapshot');
+    const btn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-700 hover:bg-zinc-600 text-zinc-100', title: '停止与快照版本进行比较（不会改变当前版本）' }, '📌 删除快照');
     btn.addEventListener('click', () => { build.snapshot = null; persist(build); mount(); });
     return btn;
   }
-  const btn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300', title: 'Freeze current build to compare against future changes' }, '📌 Snapshot');
+  const btn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300', title: '保存当前版本，以便与未来的更改进行比较。' }, '📌 保存快照');
   btn.addEventListener('click', () => {
     const snap = cloneBuild(build); snap.snapshot = null;
     build.snapshot = snap;
@@ -981,10 +981,10 @@ function snapshotBtn() {
 
 function restoreSnapshotBtn() {
   if (!build.snapshot) return el('span', { class: 'hidden' });
-  const btn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300', title: 'Revert current build to the snapshot state' }, '↩ Restore');
+  const btn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300', title: '将当前版本还原到快照状态' }, '↩ 还原');
   btn.addEventListener('click', () => {
     if (!build.snapshot) return;
-    if (!confirm('Revert current build to the snapshot? Unsnapshot edits will be lost.')) return;
+    if (!confirm('是否将当前版本还原到快照版本？还原快照版本后所做的修改将会丢失。')) return;
     const restored = cloneBuild(build.snapshot);
     restored.snapshot = null;
     build = restored;
@@ -995,19 +995,19 @@ function restoreSnapshotBtn() {
 }
 
 function jsonBtn() {
-  const btn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300', title: 'View / edit / copy build JSON' }, '{ } JSON');
+  const btn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300', title: '查看 / 编辑 / 复制 BD JSON' }, '{ } JSON');
   btn.addEventListener('click', () => openJsonDialog());
   return btn;
 }
 
 function loadSampleBtn() {
-  const btn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300', title: 'Load a fully-populated sample build (Paladin / Blessed Hammer)' }, '✨ Sample build');
+  const btn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300', title: '加载一个完整的示例配置（ 圣骑士 / 祝福之锤 ）' }, '✨ BD 示例');
   btn.addEventListener('click', () => {
     const isEmpty = build.baseMainStat === 0 && build.skillDamagePct === 0
       && build.slots.every(s => s.affixes.length === 0 && (s.weaponTypeId ?? 'none') === 'none');
-    if (!isEmpty && !confirm('Replace the current build with the sample? Your current build will be lost (Snapshot/Reset can recover it).')) return;
+    if (!isEmpty && !confirm('用示例版本替换当前版本？您当前的版本将会丢失（快照/重置可以恢复）。')) return;
     const parsed = importJsonObject(samplePaladin);
-    if (!parsed) { alert('Sample build failed to load. (Bug, please report.)'); return; }
+    if (!parsed) { alert('示例 BD 加载失败。（这是个错误，请联系站长。）'); return; }
     build = parsed;
     persist(build);
     mount();
@@ -1020,7 +1020,7 @@ function openJsonDialog() {
   const panel = el('div', { class: 'bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl w-full max-w-2xl max-h-[85vh] flex flex-col' });
 
   const header = el('div', { class: 'flex items-center justify-between px-4 py-3 border-b border-zinc-800' },
-    el('h3', { class: 'text-sm font-medium text-zinc-200' }, 'Build JSON'),
+    el('h3', { class: 'text-sm font-medium text-zinc-200' }, 'BD JSON 代码'),
     Object.assign(el('button', { class: 'text-zinc-500 hover:text-zinc-200 text-lg leading-none', 'aria-label': 'Close' }), { textContent: '✕' }),
   );
   (header.lastChild as HTMLElement).addEventListener('click', () => overlay.remove());
@@ -1033,13 +1033,13 @@ function openJsonDialog() {
 
   const status = el('span', { class: 'text-xs text-zinc-500' }, '');
 
-  const copyBtn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300' }, 'Copy');
+  const copyBtn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300' }, '复制');
   copyBtn.addEventListener('click', async () => {
     try { await navigator.clipboard.writeText(ta.value); status.textContent = 'Copied to clipboard'; status.className = 'text-xs text-emerald-400'; }
     catch { status.textContent = 'Copy failed, select & copy manually'; status.className = 'text-xs text-red-400'; }
   });
 
-  const applyBtn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-amber-600 hover:bg-amber-500 text-zinc-950 font-medium' }, 'Apply');
+  const applyBtn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-amber-600 hover:bg-amber-500 text-zinc-950 font-medium' }, '应用');
   applyBtn.addEventListener('click', () => {
     const parsed = importJson(ta.value);
     if (!parsed) { status.textContent = 'Invalid JSON, not applied'; status.className = 'text-xs text-red-400'; return; }
@@ -1049,12 +1049,12 @@ function openJsonDialog() {
     overlay.remove();
   });
 
-  const cancelBtn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300' }, 'Close');
+  const cancelBtn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300' }, '取消');
   cancelBtn.addEventListener('click', () => overlay.remove());
 
   const body = el('div', { class: 'flex-1 flex flex-col min-h-0 p-4 gap-3' });
   body.append(
-    el('p', { class: 'text-xs text-zinc-500' }, 'Edit the JSON and click Apply to load it. Copy to share or back up.'),
+    el('p', { class: 'text-xs text-zinc-500' }, '编辑 JSON 内容，然后点击 “应用” 加载。复制即可分享或备份。'),
     ta,
     el('div', { class: 'flex items-center justify-between gap-2 flex-wrap' },
       status,
@@ -1071,9 +1071,9 @@ function openJsonDialog() {
 }
 
 function resetBtn() {
-  const btn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300' }, 'Reset');
+  const btn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300' }, '重置');
   btn.addEventListener('click', () => {
-    if (!confirm('Reset to defaults?')) return;
+    if (!confirm('重置到默认设置？')) return;
     localStorage.removeItem('d4bc.build');
     window.location.hash = '';
     window.location.reload();

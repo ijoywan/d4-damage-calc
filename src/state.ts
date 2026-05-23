@@ -32,19 +32,20 @@ function migrateSlots(slotsIn: any): import('./calc').Slot[] {
     if (!found) return { ...def, affixes: [] };
     const affixes = Array.isArray(found.affixes)
       ? found.affixes
-          .filter((a: any) => a && typeof a.bucket === 'string' && a.bucket in BUCKET_META)
-          .map((a: any) => ({ bucket: a.bucket, value: validNumber(a.value, 0), ...(typeof a.label === 'string' ? { label: a.label } : {}) }))
+        .filter((a: any) => a && typeof a.bucket === 'string' && a.bucket in BUCKET_META)
+        .map((a: any) => ({ bucket: a.bucket, value: validNumber(a.value, 0), ...(typeof a.label === 'string' ? { label: a.label } : {}) }))
       : [];
     const isWeapon = def.id.startsWith('wep');
     const weaponTypeId = isWeapon
       ? (() => {
-          const rawId = typeof found.weaponTypeId === 'string' ? found.weaponTypeId : 'none';
-          const normalized = LEGACY_WEAPON_IDS[rawId] ?? rawId;
-          return knownWeaponIds.has(normalized) ? normalized : 'none';
-        })()
+        const rawId = typeof found.weaponTypeId === 'string' ? found.weaponTypeId : 'none';
+        const normalized = LEGACY_WEAPON_IDS[rawId] ?? rawId;
+        return knownWeaponIds.has(normalized) ? normalized : 'none';
+      })()
       : undefined;
     return {
       id: def.id, name: def.name, affixes,
+      text: def.text,
       ...(isWeapon ? { weaponTypeId } : {}),
     };
   });
@@ -106,7 +107,7 @@ function safeSerialToBuild(j: any): Build | null {
 }
 
 export function saveLocal(b: Build) {
-  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(buildToSerial(b))); } catch {}
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(buildToSerial(b))); } catch { }
 }
 
 export function loadLocal(): Build | null {
