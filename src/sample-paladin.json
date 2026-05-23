@@ -1,4 +1,5 @@
 {
+  "schemaVersion": 2,
   "classId": "Paladin",
   "baseMainStat": 766,
   "additiveLines": [
@@ -46,7 +47,7 @@
         {
           "bucket": "EXTRAMULT",
           "value": 0.8,
-          "label": "Heir of Perdition x80% damage"
+          "label": "Legendary Aspect: Heir of Perdition (unique) x80% damage"
         }
       ]
     },
@@ -112,7 +113,7 @@
         {
           "bucket": "EXTRAMULT",
           "value": 0.56,
-          "label": "Lagera's Sovereignty x56% Disciple"
+          "label": "Legendary Aspect: Lagera\u2019s Sovereignty (unique) x56% Disciple"
         }
       ]
     },
@@ -137,9 +138,9 @@
           "value": 1.0
         },
         {
-          "bucket": "EXTRAMULT",
+          "bucket": "CSDM",
           "value": 0.674,
-          "label": "Eagle's Eye x87% CSD * 77.5% block"
+          "label": "Legendary Aspect: Eagle\u2019s Eye x87% CSD \u00d7 77.5% block"
         }
       ]
     },
@@ -158,6 +159,11 @@
         {
           "bucket": "CSDM",
           "value": 0.5
+        },
+        {
+          "bucket": "EXTRAMULT",
+          "value": 0.13,
+          "label": "Legendary Aspect: Arbiter's Evade x13% Core Skill dmg"
         }
       ]
     },
@@ -166,8 +172,19 @@
       "name": "Ring 2",
       "affixes": [
         {
-          "bucket": "MAINSTAT",
-          "value": 151
+          "bucket": "CRITCHANCE",
+          "value": 0.215,
+          "label": "Ring of Starless Skies +21.5% crit"
+        },
+        {
+          "bucket": "SKILLRANK",
+          "value": 3,
+          "label": "Ring of Starless Skies +3 Core Skills"
+        },
+        {
+          "bucket": "EXTRAMULT",
+          "value": 0.5,
+          "label": "Legendary Aspect: Starless Skies x50% dmg (max stacks)"
         }
       ]
     },
@@ -204,7 +221,7 @@
         {
           "bucket": "EXTRAMULT",
           "value": 0.98,
-          "label": "Herald's Morningstar x98% Blessed Hammer"
+          "label": "Legendary Aspect: Herald\u2019s Morningstar (unique) x98% Blessed Hammer"
         }
       ]
     },
@@ -214,14 +231,9 @@
       "weaponTypeId": "shield",
       "affixes": [
         {
-          "bucket": "WEPDMG_PCT",
-          "value": 1.0,
-          "label": "Herald of Zakarum +100% main hand weapon damage"
-        },
-        {
           "bucket": "MAINSTAT_PCT",
           "value": 0.5,
-          "label": "Herald of Zakarum x50% Strength"
+          "label": "Legendary Aspect: Herald of Zakarum +50% Str (unique)"
         },
         {
           "bucket": "MAINSTAT",

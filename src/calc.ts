@@ -113,6 +113,8 @@ export interface AdditiveLine {
   value: number;
   applies: (s: ScenarioConditions) => boolean;
   isCritOnly?: boolean;
+  // DoT-only: applies only when computing a DoT tick (scenario.isDot). For non-DoT (hit/crit) scenarios these lines are skipped entirely.
+  isDotOnly?: boolean;
 }
 
 export interface ScenarioConditions {
@@ -124,12 +126,17 @@ export interface ScenarioConditions {
   healthy?: boolean;
   poisoned?: boolean;
   isCrit?: boolean;
+  isDot?: boolean;
 }
 
 const alwaysOn = () => true;
 const ifCrit = (s: ScenarioConditions) => !!s.isCrit;
 const ifVuln = (s: ScenarioConditions) => !!s.vulnerable;
 const ifElites = (s: ScenarioConditions) => !!s.elites;
+const ifClose = (s: ScenarioConditions) => !!s.close;
+const ifDistant = (s: ScenarioConditions) => !!s.distant;
+const ifCC = (s: ScenarioConditions) => !!s.cc;
+const ifDot = (s: ScenarioConditions) => !!s.isDot;
 
 // Note: in-game order. (No imbuement: it's a Rogue-only line and users can add it via Extra Additive.)
 export const DEFAULT_ADDITIVE_LINES: AdditiveLine[] = [
@@ -138,6 +145,10 @@ export const DEFAULT_ADDITIVE_LINES: AdditiveLine[] = [
   { id: 'all', label: '全域伤害', value: 0, applies: alwaysOn },
   { id: 'primaryElem', label: '[元素]伤害', value: 0, applies: alwaysOn },
   { id: 'elites', label: '对精英怪造成的伤害', value: 0, applies: ifElites },
+  { id: 'overTime', label: '持续性伤害', value: 0, applies: ifDot, isDotOnly: true },
+  { id: 'close', label: '对近距离敌人造成的伤害', value: 0, applies: ifClose },
+  { id: 'distant', label: '对远距离敌人造成的伤害', value: 0, applies: ifDistant },
+  { id: 'cc', label: '对控制人群造成的伤害', value: 0, applies: ifCC },
 ];
 
 // Helper that clones default lines without losing function fields (structuredClone can't clone functions)
@@ -222,9 +233,13 @@ export function computeWeaponDamage(b: Build): { dmg: number; speed: number; has
     if (w1 && w2 && weaponTypeById(w1.weaponTypeId ?? 'none').hands === 2 && weaponTypeById(w2.weaponTypeId ?? 'none').hands === 2) dmg *= 2;
   }
   const speed = speedCount > 0 ? speedSum / speedCount : 0;
-  // Bonus % weapon damage from any slot (e.g. Herald of Zakarum's +100% main hand weapon damage on the shield).
-  // Sums additively across slots and multiplies the final weapon-damage value as (1 + sum).
-  const wepDmgPctSum = sumAffixes(b.slots, 'WEPDMG_PCT');
+  // Bonus % weapon damage from any slot (e.g. aspects, uniques). Sums additively across slots
+  // and multiplies the final weapon-damage value as (1 + sum).
+  let wepDmgPctSum = sumAffixes(b.slots, 'WEPDMG_PCT');
+  // Shield innate: every D4 shield grants a +100% Weapon Damage Bonus (additive), the design intent being
+  // that 1H+shield comparable to 2H weapon damage. Applied automatically when a shield is equipped
+  // (state migration in state.ts strips legacy manual +1.00 entries to avoid double-counting).
+  if (b.slots.some(s => s.weaponTypeId === 'shield')) wepDmgPctSum += 1.0;
   return { dmg: dmg * (1 + wepDmgPctSum), speed, hasAny };
 }
 
@@ -299,7 +314,9 @@ export function scenarioDamage(b: Build, scenario: Scenario): number {
   const c = calc(b);
   if (c.weaponDmg === 0) return 0;
 
-  const baseAdd = additiveForScenario(b, scenario.conditions);
+  // Make isDot visible to AdditiveLine.applies via conditions (e.g. "Damage Over Time" lines only count on DoT ticks)
+  const conds: ScenarioConditions = { ...scenario.conditions, isDot: !!scenario.isDot };
+  const baseAdd = additiveForScenario(b, conds);
   const critAddExtra = critOnlyAdditive(b);
 
   // Vuln baseline 20% AND VDM bucket only apply when target is vulnerable
@@ -345,17 +362,17 @@ export const BUCKET_META: Record<Bucket, { label: string; isPercent: boolean; ty
   VDM: { label: 'x% 易伤伤害倍增', isPercent: true, typicalRoll: 0.10 },
   DOTM: { label: 'x% 持续伤害倍增', isPercent: true, typicalRoll: 0.10 },
   ALLM: { label: 'x% 全伤害 / 元素伤害倍增', isPercent: true, typicalRoll: 0.10 },
-  NONPHYS: { label: 'x% 非武器伤害', isPercent: true, typicalRoll: 0.10 },
+  NONPHYS: { label: 'x% 非物理伤害', isPercent: true, typicalRoll: 0.10 },
   ADDITIVE: { label: '其它 [+]%', isPercent: true, typicalRoll: 0.10 },
   CRITADD: { label: '+% 暴击伤害', isPercent: true, typicalRoll: 0.10 },
   MAINSTAT: { label: '+ 主要属性 (力量/智力/敏捷/意力)', isPercent: false, typicalRoll: 200 },
-  MAINSTAT_PCT: { label: 'x% 属性倍增', isPercent: true, typicalRoll: 0.10 },
+  MAINSTAT_PCT: { label: 'x% 属性(力量/智力/敏捷/意力)倍增', isPercent: true, typicalRoll: 0.10 },
   WEPDMG: { label: '+ 武器伤害', isPercent: false, typicalRoll: 196 },
   WEPDMG_PCT: { label: 'x% 武器伤害 (例如：盾牌加成)', isPercent: true, typicalRoll: 1.0 },
   GEM: { label: '武器宝石（总和为所有属性/元素属性）', isPercent: true, typicalRoll: 0.10 },
   CRITCHANCE: { label: '+% 暴击几率', isPercent: true, typicalRoll: 0.10 },
   SKILLRANK: { label: '+ 技能等级', isPercent: false, typicalRoll: 5 },
-  EXTRAMULT: { label: '其它 [x]% 倍增', isPercent: true, typicalRoll: 0.10 },
+  EXTRAMULT: { label: '其它 [x]% 倍增', isPercent: true, typicalRoll: 0.10 }
 };
 
 export const BUCKET_ORDER: Bucket[] = ['CSDM', 'VDM', 'DOTM', 'ALLM', 'NONPHYS', 'ADDITIVE', 'CRITADD', 'MAINSTAT', 'MAINSTAT_PCT', 'WEPDMG', 'WEPDMG_PCT', 'GEM', 'CRITCHANCE', 'SKILLRANK', 'EXTRAMULT'];
