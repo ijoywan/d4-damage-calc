@@ -398,7 +398,7 @@ function paragonContributionsCard() {
     if (factors.length > 0) {
       const combined = factors.reduce((p, a) => p * (1 + a.value), 1);
       card.append(el('div', { class: 'mt-2 flex items-center justify-between text-xs px-3 py-2 rounded bg-zinc-800/60 border border-zinc-700' },
-        el('span', { class: 'text-zinc-400' }, `Paragon / other combined [x]% factor (${factors.length} source${factors.length === 1 ? '' : 's'})`),
+        el('span', { class: 'text-zinc-400' }, `${t('Paragon / other combined [x]% factor ')}(${factors.length} ${factors.length === 1 ? t('source') : t('sources')})`),
         el('span', { class: 'text-zinc-200 font-mono font-bold tabular-nums' }, `\u00d7${combined.toFixed(2)}`),
       ));
     }
@@ -465,8 +465,8 @@ function slotBlock(slot: Slot) {
   // re-add it manually).
   if (isWeapon && slot.weaponTypeId === 'shield') {
     wrap.append(el('div', { class: 'mb-2 px-2 py-1.5 text-[11px] rounded border border-emerald-500/30 bg-emerald-500/5 text-emerald-200/90' },
-      '✓ Shield innate ',
-      el('span', { class: 'font-semibold' }, '+100% Weapon Damage Bonus'),
+      t('✓ Shield innate '),
+      el('span', { class: 'font-semibold' }, t('+100% Weapon Damage Bonus')),
       ' is auto-applied. Do not add it again. Aspect bonuses on top of it (rare) can still be added as a “+% Weapon Damage Bonus” affix.',
     ));
   }
@@ -912,8 +912,8 @@ function bucketsCard() {
     rows.push({ affix: 'x10% Vulnerable Damage Multiplier', gain: weightFor(build, 'VDM', 0.10, refScenario) });
     rows.push({ affix: 'x10% All / Element Damage Multiplier', gain: weightFor(build, 'ALLM', 0.10, refScenario) });
     rows.push({ affix: '+10% Damage (additive)', gain: weightFor(build, 'ADDITIVE', 0.10, refScenario) });
-    rows.push({ affix: `+100 ${cls.mainStat}`, gain: weightFor(build, 'MAINSTAT', 100, refScenario) });
-    rows.push({ affix: `+10% ${cls.mainStat}`, gain: weightFor(build, 'MAINSTAT_PCT', 0.10, refScenario) });
+    rows.push({ affix: `+100 ${t(cls.mainStat)}`, gain: weightFor(build, 'MAINSTAT', 100, refScenario) });
+    rows.push({ affix: `+10% ${t(cls.mainStat)}`, gain: weightFor(build, 'MAINSTAT_PCT', 0.10, refScenario) });
     rows.push({ affix: '+100 Weapon Damage', gain: weightFor(build, 'WEPDMG', 100, refScenario) });
     rows.push({ affix: '+3 Skill Ranks', gain: weightFor(build, 'SKILLRANK', 3, refScenario) });
   } else {
@@ -924,7 +924,7 @@ function bucketsCard() {
     rows.push({ affix: '+10% Damage (additive)', gain: weightFor(build, 'ADDITIVE', 0.10, refScenario) });
     rows.push({ affix: `+100 ${t(cls.mainStat)}`, gain: weightFor(build, 'MAINSTAT', 100, refScenario) });
     rows.push({ affix: `+10% ${t(cls.mainStat)}`, gain: weightFor(build, 'MAINSTAT_PCT', 0.10, refScenario) });
-    rows.push({ affix: '+5% Critical Strike Chance', gain: weightFor(build, 'CRITCHANCE', 0.05, refScenario), warn: c.critChance >= 1 ? 'capped' : undefined });
+    rows.push({ affix: '+5% Critical Strike Chance', gain: weightFor(build, 'CRITCHANCE', 0.05, refScenario), warn: c.critChance >= 1 ? t('capped') : undefined });
     rows.push({ affix: '+100 Weapon Damage', gain: weightFor(build, 'WEPDMG', 100, refScenario) });
     rows.push({ affix: '+3 Skill Ranks', gain: weightFor(build, 'SKILLRANK', 3, refScenario) });
   }
@@ -1188,7 +1188,7 @@ function buildPluggedIn(): HTMLElement {
   const rows: Row[] = [
     ['W',
       wepDmgPctSum > 0
-        ? ['Average weapon damage from your equipped weapon(s), boosted by ', katexInline('+\\%'), ' Weapon Damage Bonus affixes (shield innate, Herald of Zakarum, etc.). Combined as ', katexInline('W_{base} \\cdot (1 + \\Sigma)'), '.']
+        ? [t('Average weapon damage from your equipped weapon(s), boosted by '), katexInline('+\\%'), t(' Weapon Damage Bonus affixes (shield innate, Herald of Zakarum, etc.). Combined as '), katexInline('W_{base} \\cdot (1 + \\Sigma)'), '.']
         : t('Average weapon damage from your equipped weapon(s).'),
       wepDmgPctSum > 0 ? `× (1 + ${dec(wepDmgPctSum)})` : '',
       c.weaponDmg],
