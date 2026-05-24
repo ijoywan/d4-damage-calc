@@ -31,22 +31,25 @@ export const WEAPON_TYPES: WeaponType[] = [
   { id: 'none', label: '(无)', baseDamage: 0, speed: 0, hands: 1 },
   // 1H melee
   { id: '1h_sword', label: '单手剑', baseDamage: 1884, speed: 1.1, hands: 1, allowedClasses: ['Paladin', 'Barbarian', 'Druid', 'Necromancer', 'Rogue'] },
-  { id: '1h_mace', label: '单手杖', baseDamage: 1884, speed: 1.1, hands: 1, allowedClasses: ['Paladin', 'Barbarian', 'Druid'] },
-  { id: '1h_axe', label: '单手斧', baseDamage: 1884, speed: 1.1, hands: 1, allowedClasses: ['Paladin', 'Barbarian', 'Druid'] },
+  { id: '1h_mace', label: '单手杖', baseDamage: 1884, speed: 1.1, hands: 1, allowedClasses: ['Paladin', 'Barbarian', 'Druid', 'Necromancer', 'Sorcerer'] },
+  { id: '1h_axe', label: '单手斧', baseDamage: 1884, speed: 1.1, hands: 1, allowedClasses: ['Paladin', 'Barbarian', 'Druid', 'Necromancer'] },
+  { id: '1h_scythe', label: '单手镰刀', baseDamage: 1884, speed: 1.1, hands: 1, allowedClasses: ['Necromancer'] },
   { id: '1h_dagger', label: '单手匕首', baseDamage: 1728, speed: 1.2, hands: 1, allowedClasses: ['Rogue', 'Sorcerer', 'Warlock'] },
-  { id: '1h_flail', label: '单手连枷', baseDamage: 1728, speed: 1.0, hands: 1, allowedClasses: ['Rogue'] },
+  { id: '1h_flail', label: '单手连枷', baseDamage: 1728, speed: 1.0, hands: 1, allowedClasses: ['Paladin'] },
   { id: '1h_wand', label: '魔杖', baseDamage: 1728, speed: 1.2, hands: 1, allowedClasses: ['Sorcerer', 'Necromancer', 'Warlock'] },
   // Off-hands
-  { id: 'shield', label: '盾牌（副手）', baseDamage: 0, speed: 0, hands: 1, allowedClasses: ['Paladin', 'Barbarian', 'Necromancer'] },
+  { id: 'shield', label: '盾牌（副手）', baseDamage: 0, speed: 0, hands: 1, allowedClasses: ['Paladin', 'Barbarian', 'Necromancer', 'Sorcerer', 'Druid'] },
   { id: 'focus', label: '法器（副手）', baseDamage: 0, speed: 0, hands: 1, allowedClasses: ['Sorcerer', 'Necromancer', 'Druid', 'Warlock', 'Paladin'] },
+  { id: 'totem', label: '图腾（副手）', baseDamage: 0, speed: 0, hands: 1, allowedClasses: ['Druid'] },
   // 2H melee
-  { id: '2h_mace', label: '双手锤', baseDamage: 4607, speed: 0.9, hands: 2, allowedClasses: ['Barbarian', 'Druid', 'Paladin'] },
-  { id: '2h_axe', label: '双手斧', baseDamage: 4607, speed: 0.9, hands: 2, allowedClasses: ['Barbarian', 'Druid'] },
-  { id: '2h_sword', label: '双手剑', baseDamage: 4146, speed: 1.0, hands: 2, allowedClasses: ['Barbarian', 'Necromancer', 'Paladin'] },
+  { id: '2h_mace', label: '双手锤', baseDamage: 4607, speed: 0.9, hands: 2, allowedClasses: ['Barbarian', 'Druid', 'Paladin', 'Necromancer'] },
+  { id: '2h_axe', label: '双手斧', baseDamage: 4607, speed: 0.9, hands: 2, allowedClasses: ['Barbarian', 'Druid', 'Paladin', 'Necromancer'] },
+  { id: '2h_sword', label: '双手剑', baseDamage: 4146, speed: 1.0, hands: 2, allowedClasses: ['Barbarian', 'Druid', 'Necromancer', 'Paladin'] },
   { id: '2h_scythe', label: '双手镰刀', baseDamage: 4607, speed: 0.9, hands: 2, allowedClasses: ['Necromancer', 'Druid'] },
-  { id: '2h_polearm', label: '双手长柄武器', baseDamage: 4607, speed: 0.9, hands: 2, allowedClasses: ['Paladin', 'Spiritborn'] },
+  { id: '2h_polearm', label: '双手长柄武器', baseDamage: 4607, speed: 0.9, hands: 2, allowedClasses: ['Barbarian', 'Druid', 'Necromancer', 'Paladin', 'Spiritborn'] },
   { id: '2h_glaive', label: '双手长柄刀', baseDamage: 4146, speed: 1.0, hands: 2, allowedClasses: ['Spiritborn'] },
-  { id: '2h_qstaff', label: '双手杖', baseDamage: 3768, speed: 1.0, hands: 2, allowedClasses: ['Spiritborn', 'Sorcerer', 'Druid', 'Warlock'] },
+  { id: '2h_qstaff', label: '双手短棍', baseDamage: 3768, speed: 1.0, hands: 2, allowedClasses: ['Spiritborn'] },
+  { id: '2h_staff', label: '双手法杖', baseDamage: 3768, speed: 1.0, hands: 2, allowedClasses: ['Sorcerer', 'Necromancer', 'Druid', 'Warlock'] },
   // 2H ranged
   { id: '2h_bow', label: '弓', baseDamage: 3768, speed: 1.0, hands: 2, allowedClasses: ['Rogue'] },
   { id: '2h_xbow', label: '弩', baseDamage: 4607, speed: 0.85, hands: 2, allowedClasses: ['Rogue'] },
@@ -168,6 +171,11 @@ export interface Build {
   weaponSpeedOverride: number | null;
   disableCrit: boolean;
   enemyDamageFactor: number;
+  // Which weapon slot's base damage to use for the active skill.
+  // null = "auto" (sum baseDamage across all equipped weapons; legacy/default behavior).
+  // 'wep1'..'wep4' = use only that specific weapon's baseDamage + its own WEPDMG affixes.
+  // WEPDMG_PCT, gems, and all other global affixes still sum across the whole build.
+  skillWeaponSlotId: string | null;
   slots: Slot[];
   snapshot?: Build | null;
 }
@@ -185,6 +193,7 @@ export const DEFAULT_BUILD: Build = {
   weaponSpeedOverride: null,
   disableCrit: false,
   enemyDamageFactor: 0.2,
+  skillWeaponSlotId: null,
   slots: structuredClone(DEFAULT_SLOTS),
   snapshot: null,
 };
@@ -216,18 +225,25 @@ export function classFor(b: Build) { return CLASSES.find(c => c.id === b.classId
 
 export function computeWeaponDamage(b: Build): { dmg: number; speed: number; hasAny: boolean } {
   let dmg = 0, hasAny = false, speedSum = 0, speedCount = 0;
+  // Auto mode (skillWeaponSlotId null/unset): sum baseDamage + WEPDMG across every equipped weapon.
+  // Explicit mode: only the chosen slot's baseDamage and slot-local WEPDMG affixes count toward dmg,
+  // but speed is still averaged across all equipped weapons (matches how attack speed displays in-game).
+  const explicitSlotId = b.skillWeaponSlotId;
   for (const slot of b.slots) {
     const isWeaponSlot = slot.id.startsWith('wep');
     if (!isWeaponSlot) continue;
+    const countDmg = explicitSlotId == null || slot.id === explicitSlotId;
     if (slot.weaponTypeId) {
       const wt = weaponTypeById(slot.weaponTypeId);
-      if (wt.baseDamage > 0) { dmg += wt.baseDamage; hasAny = true; }
+      if (countDmg && wt.baseDamage > 0) { dmg += wt.baseDamage; hasAny = true; }
       if (wt.speed > 0) { speedSum += wt.speed; speedCount++; }
     }
-    for (const a of slot.affixes) if (a.bucket === 'WEPDMG') dmg += a.value;
+    if (countDmg) for (const a of slot.affixes) if (a.bucket === 'WEPDMG') dmg += a.value;
   }
-  // Barbarian dual-2H bonus (legacy spreadsheet behavior; only meaningful when Barb has both wep1+wep2 as 2H weapons)
-  if (b.classId === 'Barbarian' && hasAny) {
+  // Barbarian dual-2H bonus (legacy spreadsheet behavior; only meaningful when Barb has both wep1+wep2 as 2H weapons).
+  // Only applies in auto mode: in explicit-slot mode the user has picked exactly one weapon, so the
+  // "both 2H slots contribute as one virtual weapon" workaround no longer makes sense.
+  if (b.classId === 'Barbarian' && hasAny && explicitSlotId == null) {
     const w1 = b.slots.find(s => s.id === 'wep1');
     const w2 = b.slots.find(s => s.id === 'wep2');
     if (w1 && w2 && weaponTypeById(w1.weaponTypeId ?? 'none').hands === 2 && weaponTypeById(w2.weaponTypeId ?? 'none').hands === 2) dmg *= 2;
