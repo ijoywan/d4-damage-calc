@@ -2,6 +2,7 @@ import './style.css';
 import 'katex/dist/katex.min.css';
 import katex from 'katex';
 import samplePaladin from './sample-paladin.json';
+import zhCN from './i18n/zh-CN.json';
 import {
   calc, classFor, CLASSES, BUCKET_META, BUCKET_ORDER,
   weightFor, scenarioDamage, scenarioDamageNoCrit,
@@ -11,6 +12,7 @@ import {
 } from './calc';
 import { loadInitialBuild, persist, exportJson, importJson, cloneBuild, buildShareUrl, importJsonObject } from './state';
 
+const languages: { [key: string]: string } = zhCN;
 let build: Build = loadInitialBuild();
 
 const fmtPct = (n: number, digits = 2) => (n * 100).toFixed(digits) + '%';
@@ -19,9 +21,9 @@ const fmtBigNum = (n: number) => {
   if (!isFinite(n) || n === 0) return '0';
   if (n >= 1e15) return (n / 1e15).toFixed(2) + 'Q';   // quadrillions
   if (n >= 1e12) return (n / 1e12).toFixed(2) + 'T';   // trillions
-  if (n >= 1e9)  return (n / 1e9).toFixed(2)  + 'B';
-  if (n >= 1e6)  return (n / 1e6).toFixed(2)  + 'M';
-  if (n >= 1e3)  return (n / 1e3).toFixed(2)  + 'K';
+  if (n >= 1e9) return (n / 1e9).toFixed(2) + 'B';
+  if (n >= 1e6) return (n / 1e6).toFixed(2) + 'M';
+  if (n >= 1e3) return (n / 1e3).toFixed(2) + 'K';
   return fmtNum(n, 0);
 };
 const stripTrailingZero = (s: string) => s.includes('.') ? s.replace(/\.?0+$/, '') : s;
@@ -44,8 +46,23 @@ function el<K extends keyof HTMLElementTagNameMap>(tag: K, attrs: Record<string,
     else if (k.startsWith('on') && typeof attrs[k] === 'function') (e as any)[k.toLowerCase()] = attrs[k];
     else if (attrs[k] !== undefined && attrs[k] !== null) e.setAttribute(k, String(attrs[k]));
   }
-  for (const c of children) if (c != null) e.append(c as any);
+  for (const c of children) {
+    if (c != null) {
+      if (typeof c == "string") {
+        if (!(c in languages)) {
+          console.log("i18n:", c)
+        }
+        e.append((languages[c as string] ?? c) as any);
+      } else {
+        e.append(c as any);
+      }
+    }
+  }
   return e;
+}
+
+function t(text: string) {
+  return languages[text as string] ?? text;
 }
 
 function inputCls() { return 'bg-zinc-900 border border-zinc-800 rounded px-2 py-1 text-sm text-zinc-200 focus:outline-none focus:border-amber-600'; }
@@ -164,9 +181,9 @@ function renderHeader() {
           el('h1', { class: 'text-lg font-bold leading-tight' }, 'Diablo 4 (Lord of Hatred) Damage Calculator'),
           el('div', { class: 'text-[10px] text-zinc-500 leading-tight' },
             'Calculator design + math by ',
-            Object.assign(el('a', { href: 'https://www.youtube.com/@avarilyn', target: '_blank', class: 'text-amber-400 hover:underline' }), { textContent: 'Avarilyn' }),
+            Object.assign(el('a', { href: 'https://www.youtube.com/@avarilyn', target: '_blank', class: 'text-amber-400 hover:underline' }), { textContent: t('Avarilyn') }),
             ' · web port by ',
-            Object.assign(el('a', { href: 'https://github.com/jlian', target: '_blank', class: 'text-amber-400 hover:underline' }), { textContent: 'jlian' }),
+            Object.assign(el('a', { href: 'https://github.com/jlian', target: '_blank', class: 'text-amber-400 hover:underline' }), { textContent: t('jlian') }),
           ),
         ),
       ),
@@ -258,7 +275,7 @@ function nakedBaselineCard() {
     const customAdds = paragonSlot.affixes.filter(a => a.bucket === 'ADDITIVE');
     customAdds.forEach((a) => {
       const row = el('div', { class: 'flex items-center gap-2 mb-1.5' });
-      row.append(textInput(() => a.label ?? '', v => { a.label = v; }, { w: 'flex-1', placeholder: 'e.g. Damage with Imbued' }));
+      row.append(textInput(() => a.label ?? '', v => { a.label = v; }, { w: 'flex-1', placeholder: t('e.g. Damage with Imbued') }));
       row.append(pctInput(() => a.value, v => a.value = v, { w: 'w-24' }));
       row.append(el('span', { class: 'text-zinc-600 text-xs' }, '%'));
       const del = el('button', { class: 'text-zinc-500 hover:text-red-400 px-2' }, '✕');
@@ -296,7 +313,7 @@ function slotsCard() {
 function charmsCard() {
   const card = sectionCard('Charms, Seal & Set Bonus',
     '6 charm slots, the Horadric Seal, and a dedicated Set Bonus row. Each carries affixes that go into damage buckets. For set bonuses (e.g., 5pc Disciple x500% damage), use the Custom [x]% bucket on the Set Bonus row so it isn\u2019t tied to a specific charm.');
-  const order = ['charm1','charm2','charm3','charm4','charm5','charm6','seal','setBonus'];
+  const order = ['charm1', 'charm2', 'charm3', 'charm4', 'charm5', 'charm6', 'seal', 'setBonus'];
   for (const id of order) {
     const slot = build.slots.find(s => s.id === id);
     if (slot) card.append(slotBlock(slot));
@@ -307,7 +324,7 @@ function charmsCard() {
 function glyphsCard() {
   const card = sectionCard('Glyph Sockets (5 max)',
     'Each glyph has up to 3 sources of damage: the additive bonus (top), additional bonus (often conditional, ignore if not steady-state), and the legendary bonus (bottom). Enter ONLY the legendary bonus here. The additive parts are already in the Baseline Stats card above.');
-  const order = ['glyph1','glyph2','glyph3','glyph4','glyph5'];
+  const order = ['glyph1', 'glyph2', 'glyph3', 'glyph4', 'glyph5'];
   for (const id of order) {
     const slot = build.slots.find(s => s.id === id);
     if (slot) card.append(slotBlock(slot));
@@ -365,7 +382,7 @@ function slotBlock(slot: Slot) {
   // Slots eligible for a pinned legendary aspect row (essentially all armor / jewelry / weapons).
   // We expand these even when empty so the user always sees the aspect placeholder + gem rows.
   // Charms / seal / glyphs / set bonus do NOT carry aspects, so they keep the collapsed-when-empty behavior.
-  const GEAR_SLOTS = new Set(['helm','chest','pants','boots','gloves','amulet','ring1','ring2','wep1','wep2','wep3','wep4']);
+  const GEAR_SLOTS = new Set(['helm', 'chest', 'pants', 'boots', 'gloves', 'amulet', 'ring1', 'ring2', 'wep1', 'wep2', 'wep3', 'wep4']);
   const isGearSlot = GEAR_SLOTS.has(slot.id);
   if (isEmpty && !isWeapon && !isParagon && !isGearSlot) {
     const row = el('div', { class: 'flex items-center justify-between gap-3 py-1.5 px-3 mb-1 border border-zinc-800/60 rounded text-sm hover:border-zinc-700 transition-colors' });
@@ -401,7 +418,7 @@ function slotBlock(slot: Slot) {
         title: overrides !== 0
           ? `Base ${wt.baseDamage.toLocaleString()} + ${overrides >= 0 ? '+' : ''}${overrides.toLocaleString()} from + Weapon Damage affix(es) below`
           : `Built-in baseline for ${wt.label}. Add a “+ Weapon Damage” affix below to override.`,
-      }, `${total.toLocaleString()} dmg`);
+      }, `${total.toLocaleString()} ${t('dmg')}`);
       header.append(dmgChip);
     }
   }
@@ -436,7 +453,7 @@ function slotBlock(slot: Slot) {
   const gemLabels = isArmorGemSlot
     ? ARMOR_GEM_LABELS
     : isWeaponGemSlot ? WEAPON_GEM_LABELS.slice(0, weaponSockets)
-    : [];
+      : [];
 
   // (Removed weaponAvgDamage input. The hardcoded baseline + WEPDMG affix already matches the in-game tooltip.)
 
@@ -490,7 +507,7 @@ function slotBlock(slot: Slot) {
     // Sits between the bucket dropdown and the value so it shares the row instead of wrapping below.
     const labelable = a.bucket === 'EXTRAMULT' || a.bucket === 'ADDITIVE' || a.bucket === 'MAINSTAT_PCT' || a.bucket === 'GEM';
     if (labelable) {
-      row.append(textInput(() => a.label ?? '', v => { a.label = v; }, { w: 'w-full sm:flex-1 min-w-0', placeholder: 'Optional label (e.g. “Heir of Perdition”)' }));
+      row.append(textInput(() => a.label ?? '', v => { a.label = v; }, { w: 'w-full sm:flex-1 min-w-0', placeholder: t('Optional label (e.g. “Heir of Perdition”)') }));
     }
 
     // Number input + unit suffix as a fixed-width pair so percent and non-percent rows align.
@@ -570,7 +587,7 @@ function slotBlock(slot: Slot) {
     };
 
     // Optional descriptor (free text). Stored in the label as `Legendary Aspect: <desc>`.
-    const desc = el('input', { type: 'text', placeholder: 'e.g. of Berserk Ripping, Edgemaster\u2019s', class: inputCls() + ' flex-1 min-w-0 text-xs' }) as HTMLInputElement;
+    const desc = el('input', { type: 'text', placeholder: t('e.g. of Berserk Ripping, Edgemaster\u2019s'), class: inputCls() + ' flex-1 min-w-0 text-xs' }) as HTMLInputElement;
     desc.value = existingAspect && existingAspect.label && existingAspect.label.startsWith(ASPECT_LABEL_KEY + ':')
       ? existingAspect.label.slice(ASPECT_LABEL_KEY.length + 1).trim()
       : '';
@@ -657,13 +674,13 @@ function slotBlock(slot: Slot) {
       const prefix = el('span', { class: 'text-zinc-500 text-sm' }, isArmor ? '+' : 'x');
       const input = (isArmor
         ? numInput(
-            () => findGem()?.value ?? lastValue,
-            v => { lastValue = v; const g = findGem(); if (g) g.value = v; },
-            { w: 'w-16 text-right' })
+          () => findGem()?.value ?? lastValue,
+          v => { lastValue = v; const g = findGem(); if (g) g.value = v; },
+          { w: 'w-16 text-right' })
         : pctInput(
-            () => findGem()?.value ?? lastValue,
-            v => { lastValue = v; const g = findGem(); if (g) g.value = v; },
-            { w: 'w-16 text-right' })) as HTMLInputElement;
+          () => findGem()?.value ?? lastValue,
+          v => { lastValue = v; const g = findGem(); if (g) g.value = v; },
+          { w: 'w-16 text-right' })) as HTMLInputElement;
       const suffix = el('span', { class: 'text-zinc-400 text-sm' }, isArmor
         ? cls.mainStat
         : '% Element Damage Multiplier');
@@ -722,8 +739,10 @@ function scenariosCard() {
       (dotOn ? 'text-emerald-300' : 'text-zinc-400 hover:text-zinc-200'),
   },
     el('span', { class: 'normal-case tracking-normal' }, 'DoT skill'),
-    el('span', { class: 'relative inline-block w-9 h-5 rounded-full transition ' +
-      (dotOn ? 'bg-emerald-500/70' : 'bg-zinc-700 group-hover:bg-zinc-600') },
+    el('span', {
+      class: 'relative inline-block w-9 h-5 rounded-full transition ' +
+        (dotOn ? 'bg-emerald-500/70' : 'bg-zinc-700 group-hover:bg-zinc-600')
+    },
       el('span', { class: 'absolute top-0.5 left-0.5 w-4 h-4 rounded-full bg-zinc-100 shadow transition-transform ' + (dotOn ? 'translate-x-4' : 'translate-x-0') }),
     ),
   );
@@ -767,7 +786,7 @@ function scenariosCard() {
       'DoT tick: non-crit hit × Damage Over Time Multiplier, with DoT-only additive lines applied. Vulnerable / conditional toggles still apply.'));
   } else {
     row = el('div', { class: showDotReadout ? 'grid grid-cols-3 gap-2 mb-2' : 'grid grid-cols-2 gap-2 mb-2' });
-    row.append(cell('Hit',  fmtBigNum(hitDmg),  'text-zinc-100'));
+    row.append(cell('Hit', fmtBigNum(hitDmg), 'text-zinc-100'));
     row.append(cell('Crit', fmtBigNum(critDmg), 'text-amber-400'));
     if (showDotReadout) {
       row.append(cell('DoT tick', fmtBigNum(dotDmg), 'text-emerald-400',
@@ -782,7 +801,7 @@ function scenariosCard() {
   if (!isDotMode) {
     const avg = critDmg * c.critChance + hitDmg * (1 - c.critChance);
     card.append(el('div', { class: 'mt-2 mb-1 flex items-baseline justify-center gap-2' },
-      el('span', { class: 'text-[11px] text-zinc-500' }, `Average @ ${(c.critChance*100).toFixed(1)}% crit`),
+      el('span', { class: 'text-[11px] text-zinc-500' }, `${t('Average @')} ${(c.critChance * 100).toFixed(1)}% ${t('crit')}`),
       el('span', { class: 'text-lg font-bold font-mono text-zinc-100 tabular-nums' }, fmtBigNum(avg)),
     ));
   }
@@ -791,10 +810,10 @@ function scenariosCard() {
   const togglesRow = el('div', { class: 'pt-3 mt-2 border-t border-zinc-800/80 flex flex-wrap gap-1.5' });
   const toggles: { key: keyof typeof scenarioState; label: string }[] = [
     { key: 'vulnerable', label: 'Vulnerable' },
-    { key: 'elites',     label: 'Elite' },
-    { key: 'close',      label: 'Close' },
-    { key: 'distant',    label: 'Distant' },
-    { key: 'cc',         label: 'CC' },
+    { key: 'elites', label: 'Elite' },
+    { key: 'close', label: 'Closed' },
+    { key: 'distant', label: 'Distant' },
+    { key: 'cc', label: 'CC' },
   ];
   for (const t of toggles) {
     const active = !!scenarioState[t.key];
@@ -821,7 +840,7 @@ function scenariosCard() {
       const sign = delta >= 0 ? '+' : '';
       const cls = delta > 0 ? 'text-emerald-400' : delta < 0 ? 'text-red-400' : 'text-zinc-500';
       const deltaRow = el('div', { class: 'mt-2 pt-2 border-t border-zinc-800 flex items-center justify-between text-xs gap-2' });
-      deltaRow.append(el('span', { class: 'text-zinc-500' }, '📌 vs saved build:'));
+      deltaRow.append(el('span', { class: 'text-zinc-500' }, t('📌 vs saved build:')));
       deltaRow.append(el('span', { class: cls + ' font-bold tabular-nums' }, sign + fmtPct(delta, 2)));
       card.append(deltaRow);
     }
@@ -857,25 +876,25 @@ function bucketsCard() {
   const rows: Row[] = [];
   if (isDotMode) {
     // DoT-focused affix list: drop crit-related rows, surface DOTM.
-    rows.push({ affix: 'x10% Damage Over Time Multiplier',  gain: weightFor(build, 'DOTM', 0.10, refScenario) });
+    rows.push({ affix: 'x10% Damage Over Time Multiplier', gain: weightFor(build, 'DOTM', 0.10, refScenario) });
     rows.push({ affix: 'x10% Vulnerable Damage Multiplier', gain: weightFor(build, 'VDM', 0.10, refScenario) });
     rows.push({ affix: 'x10% All / Element Damage Multiplier', gain: weightFor(build, 'ALLM', 0.10, refScenario) });
-    rows.push({ affix: '+10% Damage (additive)',            gain: weightFor(build, 'ADDITIVE', 0.10, refScenario) });
-    rows.push({ affix: `+100 ${cls.mainStat}`,              gain: weightFor(build, 'MAINSTAT', 100, refScenario) });
-    rows.push({ affix: `+10% ${cls.mainStat}`,              gain: weightFor(build, 'MAINSTAT_PCT', 0.10, refScenario) });
-    rows.push({ affix: '+100 Weapon Damage',                gain: weightFor(build, 'WEPDMG', 100, refScenario) });
-    rows.push({ affix: '+3 Skill Ranks',                    gain: weightFor(build, 'SKILLRANK', 3, refScenario) });
+    rows.push({ affix: '+10% Damage (additive)', gain: weightFor(build, 'ADDITIVE', 0.10, refScenario) });
+    rows.push({ affix: `+100 ${cls.mainStat}`, gain: weightFor(build, 'MAINSTAT', 100, refScenario) });
+    rows.push({ affix: `+10% ${cls.mainStat}`, gain: weightFor(build, 'MAINSTAT_PCT', 0.10, refScenario) });
+    rows.push({ affix: '+100 Weapon Damage', gain: weightFor(build, 'WEPDMG', 100, refScenario) });
+    rows.push({ affix: '+3 Skill Ranks', gain: weightFor(build, 'SKILLRANK', 3, refScenario) });
   } else {
     rows.push({ affix: 'x10% Critical Strike Damage Multiplier', gain: weightFor(build, 'CSDM', 0.10, refScenario) });
-    rows.push({ affix: 'x10% Vulnerable Damage Multiplier',      gain: weightFor(build, 'VDM', 0.10, refScenario) });
-    rows.push({ affix: 'x10% All / Element Damage Multiplier',   gain: weightFor(build, 'ALLM', 0.10, refScenario) });
-    rows.push({ affix: '+10% Critical Strike Damage',            gain: weightFor(build, 'CRITADD', 0.10, refScenario) });
-    rows.push({ affix: '+10% Damage (additive)',                 gain: weightFor(build, 'ADDITIVE', 0.10, refScenario) });
-    rows.push({ affix: `+100 ${cls.mainStat}`,                   gain: weightFor(build, 'MAINSTAT', 100, refScenario) });
-    rows.push({ affix: `+10% ${cls.mainStat}`,                   gain: weightFor(build, 'MAINSTAT_PCT', 0.10, refScenario) });
-    rows.push({ affix: '+5% Critical Strike Chance',             gain: weightFor(build, 'CRITCHANCE', 0.05, refScenario), warn: c.critChance >= 1 ? 'capped' : undefined });
-    rows.push({ affix: '+100 Weapon Damage',                     gain: weightFor(build, 'WEPDMG', 100, refScenario) });
-    rows.push({ affix: '+3 Skill Ranks',                         gain: weightFor(build, 'SKILLRANK', 3, refScenario) });
+    rows.push({ affix: 'x10% Vulnerable Damage Multiplier', gain: weightFor(build, 'VDM', 0.10, refScenario) });
+    rows.push({ affix: 'x10% All / Element Damage Multiplier', gain: weightFor(build, 'ALLM', 0.10, refScenario) });
+    rows.push({ affix: '+10% Critical Strike Damage', gain: weightFor(build, 'CRITADD', 0.10, refScenario) });
+    rows.push({ affix: '+10% Damage (additive)', gain: weightFor(build, 'ADDITIVE', 0.10, refScenario) });
+    rows.push({ affix: `+100 ${t(cls.mainStat)}`, gain: weightFor(build, 'MAINSTAT', 100, refScenario) });
+    rows.push({ affix: `+10% ${t(cls.mainStat)}`, gain: weightFor(build, 'MAINSTAT_PCT', 0.10, refScenario) });
+    rows.push({ affix: '+5% Critical Strike Chance', gain: weightFor(build, 'CRITCHANCE', 0.05, refScenario), warn: c.critChance >= 1 ? 'capped' : undefined });
+    rows.push({ affix: '+100 Weapon Damage', gain: weightFor(build, 'WEPDMG', 100, refScenario) });
+    rows.push({ affix: '+3 Skill Ranks', gain: weightFor(build, 'SKILLRANK', 3, refScenario) });
   }
   rows.sort((a, b) => b.gain - a.gain);
 
@@ -974,7 +993,7 @@ function statsCard() {
   for (const r of baselineAdditiveRows) stats.push(r);
   // x% multipliers in alphabetical order (matches dropdown). Weapon gem already sums into the
   // ALLM bucket internally, so it's reflected in the All / Element row; no separate gem row needed.
-  stats.push(['x% All / Element Damage Multiplier', bonus(c.allm - 1)]);
+  stats.push([`x% ${t("All / Element Damage Multiplier")}`, bonus(c.allm - 1)]);
   if (!isDotMode) stats.push(['x% Critical Strike Damage Multiplier', bonus(c.csdm - 1)]);
   // DoT bucket always shown in DoT mode (even if 0, so user sees the dial they'd be tuning); otherwise only if non-trivial.
   if (isDotMode || c.dotm > 1) stats.push(['x% Damage Over Time Multiplier', bonus(c.dotm - 1)]);
@@ -1000,11 +1019,11 @@ function formulaCard() {
   const card = el('section', { class: 'bg-zinc-900/30 border border-zinc-800 rounded-lg p-4 sm:p-6 text-sm text-zinc-300' });
   card.append(el('h2', { class: 'text-sm font-semibold text-zinc-300 uppercase tracking-wide mb-3' }, 'How the formula works'));
   card.append(el('p', { class: 'mb-4' },
-    'D4 damage is a single product of factors. Each factor (a "bucket") is either a sum of additive % values or a single multiplier. The marginal value of an affix is approximately ',
-    katexInline('\\Delta / B'), ', where ', katexInline('B'), ' is the bucket\'s current value. Smaller buckets give bigger gains: at sizes ',
-    katexInline('A'), ' and ', katexInline('B'),
-    ', the same affix is worth ', katexInline('B / A'), ' times more in the smaller bucket, so a balanced spread of multipliers maximizes the product (',
-    Object.assign(el('a', { href: 'https://en.wikipedia.org/wiki/Inequality_of_arithmetic_and_geometric_means', target: '_blank', class: 'text-amber-400 hover:underline' }), { textContent: 'AM-GM inequality' }), ').',
+    t('D4 damage is a single product of factors. Each factor (a "bucket") is either a sum of additive % values or a single multiplier. The marginal value of an affix is approximately '),
+    katexInline('\\Delta / B'), t(', where '), katexInline('B'), t(" is the bucket\\'s current value. Smaller buckets give bigger gains: at sizes "),
+    katexInline('A'), t(' and '), katexInline('B'),
+    t(', the same affix is worth '), katexInline('B / A'), t(' times more in the smaller bucket, so a balanced spread of multipliers maximizes the product ('),
+    Object.assign(el('a', { href: 'https://en.wikipedia.org/wiki/Inequality_of_arithmetic_and_geometric_means', target: '_blank', class: 'text-amber-400 hover:underline' }), { textContent: t('AM-GM inequality') }), ').',
   ));
 
   // Main formula. Use plain symbols, not in-build jargon.
@@ -1019,13 +1038,13 @@ function formulaCard() {
 
   card.append(el('p', { class: 'text-xs text-zinc-500 mt-4' },
     'Methodology, formulas, weapon damage values, and stacking rules: ',
-    Object.assign(el('a', { href: 'https://www.youtube.com/watch?v=2GKhCdxxqp8', target: '_blank', class: 'text-amber-400 hover:underline' }), { textContent: 'Avarilyn: Damage Calculation Explained with Proof' }),
+    Object.assign(el('a', { href: 'https://www.youtube.com/watch?v=2GKhCdxxqp8', target: '_blank', class: 'text-amber-400 hover:underline' }), { textContent: t('Avarilyn: Damage Calculation Explained with Proof') }),
     ' / ',
-    Object.assign(el('a', { href: 'https://www.youtube.com/watch?v=as8y_zGlPrs', target: '_blank', class: 'text-amber-400 hover:underline' }), { textContent: 'How to Optimize Damage' }),
+    Object.assign(el('a', { href: 'https://www.youtube.com/watch?v=as8y_zGlPrs', target: '_blank', class: 'text-amber-400 hover:underline' }), { textContent: t('How to Optimize Damage') }),
     ' / ',
-    Object.assign(el('a', { href: 'https://docs.google.com/spreadsheets/d/1qM6XySdTPuoCF4pEndWihBy0oONayRwZZ9WePkn_TFU/', target: '_blank', class: 'text-amber-400 hover:underline' }), { textContent: 'Original Sheet' }),
+    Object.assign(el('a', { href: 'https://docs.google.com/spreadsheets/d/1qM6XySdTPuoCF4pEndWihBy0oONayRwZZ9WePkn_TFU/', target: '_blank', class: 'text-amber-400 hover:underline' }), { textContent: t('Original Sheet') }),
     ' \u00b7 ',
-    Object.assign(el('a', { href: 'https://github.com/jlian/d4-damage-calc', target: '_blank', class: 'text-amber-400 hover:underline' }), { textContent: 'GitHub source' }),
+    Object.assign(el('a', { href: 'https://github.com/jlian/d4-damage-calc', target: '_blank', class: 'text-amber-400 hover:underline' }), { textContent: t('GitHub source') }),
     '.',
   ));
 
@@ -1038,11 +1057,11 @@ function additiveBreakdown(b: Build, conds: any): string {
   const parts: string[] = [];
   for (const l of b.additiveLines) {
     if (l.isCritOnly) continue;
-    if (l.applies(conds) && l.value > 0) parts.push(`${l.label} ${(l.value*100).toFixed(0)}%`);
+    if (l.applies(conds) && l.value > 0) parts.push(`${l.label} ${(l.value * 100).toFixed(0)}%`);
   }
   let slotAdd = 0;
   for (const slot of b.slots) for (const aa of slot.affixes) if (aa.bucket === 'ADDITIVE') slotAdd += aa.value;
-  if (slotAdd > 0) parts.push(`gear/extras ${(slotAdd*100).toFixed(1)}%`);
+  if (slotAdd > 0) parts.push(`gear/extras ${(slotAdd * 100).toFixed(1)}%`);
   return parts.length ? ` (sum of ${parts.join(', ')})` : '';
 }
 
@@ -1138,43 +1157,43 @@ function buildPluggedIn(): HTMLElement {
     ['W',
       wepDmgPctSum > 0
         ? ['Average weapon damage from your equipped weapon(s), boosted by ', katexInline('+\\%'), ' Weapon Damage Bonus affixes (shield innate, Herald of Zakarum, etc.). Combined as ', katexInline('W_{base} \\cdot (1 + \\Sigma)'), '.']
-        : 'Average weapon damage from your equipped weapon(s).',
+        : t('Average weapon damage from your equipped weapon(s).'),
       wepDmgPctSum > 0 ? `× (1 + ${dec(wepDmgPctSum)})` : '',
       c.weaponDmg],
     ['(1 + A)',
       critAdd > 0
-        ? ['Additive damage bucket. On a crit, includes the ', katexInline('+\\%'), ' Crit Damage additive too; non-crit hits use just the base bucket.']
+        ? [t('Additive damage bucket. On a crit, includes the '), katexInline('+\\%'), t(' Crit Damage additive too; non-crit hits use just the base bucket.')]
         : 'Sum of all additive damage % bonuses.',
       addMath || `1 + ${dec(usedAdd)}`, 1 + usedAdd],
     [`(1 + S/${cls.divisor})`,
-      [`${cls.mainStat} multiplier. Divisor is `, katexInline(String(cls.divisor)), ` for ${build.classId} (Barbarian uses `, katexInline('900'), ', all others ', katexInline('800'), ').'],
-      `1 + ${dec(c.mainStatSum, 0)}/${cls.divisor}`, c.mainStatMult],
+    [t(cls.mainStat), t(` multiplier. Divisor is `), katexInline(String(cls.divisor)), ` for `, t(build.classId), t(`(Barbarian uses `), katexInline('900'), t(', all others '), katexInline('800'), t(').')],
+    `1 + ${dec(c.mainStatSum, 0)}/${cls.divisor}`, c.mainStatMult],
     ['C',
-      ['Skill damage coefficient. Step formula: ', katexInline(String.raw`\text{base} \cdot \left(1 + 0.10 \cdot (N - \lfloor N/5 \rfloor - 1) + 0.15 \cdot \lfloor N/5 \rfloor\right)`), ' where ', katexInline('N'), ' = total ranks. Every multiple of 5 ranks gets a ', katexInline('+5\\%'), ' bonus on top.'],
+      [t('Skill damage coefficient. Step formula: '), katexInline(String.raw`\text{base} \cdot \left(1 + 0.10 \cdot (N - \lfloor N/5 \rfloor - 1) + 0.15 \cdot \lfloor N/5 \rfloor\right)`), t(' where '), katexInline('N'), t(' = total ranks. Every multiple of 5 ranks gets a '), katexInline('+5\\%'), t(' bonus on top.')],
       skillMath, c.skillCoef],
     [String.raw`\prod_i M_i`,
-      'Product of standalone aspect/unique multipliers. Each one is its own factor.',
-      extraMultMath(build), c.extraMultProduct],
+    t('Product of standalone aspect/unique multipliers. Each one is its own factor.'),
+    extraMultMath(build), c.extraMultProduct],
   ];
   // Crit / DoT factor: swap rows based on mode. Both branches keep the same overall row count
   // so the formula card layout stays consistent.
   if (isDotMode) {
     rows.push([String.raw`M_{dot}^d`,
-      ['DoT factor: Damage Over Time Multiplier bucket. Active only on DoT ticks (', katexInline('d = 1'), '). Crit factor is inactive because DoT skills cannot crit.'],
-      bucketBreakdownMath(build, 'DOTM'), c.dotm]);
+    [t('DoT factor: Damage Over Time Multiplier bucket. Active only on DoT ticks ('), katexInline('d = 1'), t(').'), t(' Crit factor is inactive because DoT skills cannot crit.')],
+    bucketBreakdownMath(build, 'DOTM'), c.dotm]);
   } else {
     rows.push([String.raw`(1.5 \cdot M_{crit})^c`,
-      ['Crit factor: ', katexInline('1.5'), ' inherent crit baseline times the Critical Strike Damage Multiplier bucket. Active only on crit hits (', katexInline('c = 1'), ').'],
-      `1.5 × (${csdmMath})`, c.csdm * 1.5]);
+    [t('Crit factor: '), katexInline('1.5'), t(' inherent crit baseline times the Critical Strike Damage Multiplier bucket. Active only on crit hits ('), katexInline('c = 1'), t(').')],
+    `1.5 × (${csdmMath})`, c.csdm * 1.5]);
   }
   rows.push([String.raw`(1.2 \cdot M_{vuln})^v`,
-    ['Vulnerable factor: ', katexInline('1.2'), ' inherent vuln baseline times the Vulnerable Damage Multiplier bucket. Active only against vulnerable targets (', katexInline('v = 1'), ').'],
-    conds.vulnerable ? `1.2 × (${vdmMath})` : 'inactive (v = 0)', vdmFactor]);
+  [t('Vulnerable factor: '), katexInline('1.2'), t(' inherent vuln baseline times the Vulnerable Damage Multiplier bucket. Active only against vulnerable targets ('), katexInline('v = 1'), t(').')],
+  conds.vulnerable ? `1.2 × (${vdmMath})` : 'inactive (v = 0)', vdmFactor]);
   rows.push(['M_{all}',
-    'All / Element Damage Multiplier bucket. Includes weapon gem damage which sums into this bucket.',
+    t('All / Element Damage Multiplier bucket. Includes weapon gem damage which sums into this bucket.'),
     allmMath, c.allm]);
   rows.push(['(1 - R)',
-    ['Enemy damage reduction. ', katexInline('R = 0.80'), ' for a level-appropriate enemy / training dummy (80% reduction).'],
+    [t('Enemy damage reduction. '), katexInline('R = 0.80'), t(' for a level-appropriate enemy / training dummy (80% reduction).')],
     `1 - 0.80`, build.enemyDamageFactor]);
 
   const tb = el('tbody', { class: 'block sm:table-row-group' });
@@ -1207,7 +1226,7 @@ function buildPluggedIn(): HTMLElement {
       el('span', { class: 'text-sm text-zinc-300' }, `Crit hit damage`),
       el('span', { class: 'text-2xl font-bold text-amber-400 font-mono' }, fmtBigNum(critDmg)),
     ));
-    wrap.append(el('div', { class: 'text-xs text-zinc-500 mt-2' }, `Average (with ${(c.critChance*100).toFixed(0)}% crit chance) = ${fmtBigNum(avgDmg)}`));
+    wrap.append(el('div', { class: 'text-xs text-zinc-500 mt-2' }, `${t('Average (with ')}${(c.critChance * 100).toFixed(0)}% ${t('crit chance)')} = ${fmtBigNum(avgDmg)}`));
   }
   void hi; // unused helper
   return wrap;
@@ -1226,13 +1245,13 @@ function katexBlock(tex: string): HTMLElement {
 
 // ---------- header buttons ----------
 function copyShareBtn() {
-  const btn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-amber-600 hover:bg-amber-500 text-zinc-950 font-medium', title: 'Copy a shareable link that encodes the current build' }, 'Copy Share Link');
+  const btn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-amber-600 hover:bg-amber-500 text-zinc-950 font-medium', title: t('Copy a shareable link that encodes the current build') }, t('Copy Share Link'));
   btn.addEventListener('click', async () => {
     const url = buildShareUrl(build);
     try { await navigator.clipboard.writeText(url); }
-    catch { prompt('Copy this link:', url); }
+    catch { prompt(t('Copy this link:'), url); }
     const old = btn.textContent;
-    btn.textContent = 'Copied!';
+    btn.textContent = t('Copied!');
     setTimeout(() => { btn.textContent = old; }, 1500);
   });
   return btn;
@@ -1245,10 +1264,10 @@ function snapshotBtn() {
   const saved = build.snapshot;
   const dirty = !!saved && !buildsEqualForCompare(build, saved);
   const isFresh = !!saved && !dirty;
-  const label = saved ? (dirty ? 'Save Build' : 'Saved') : 'Save Build';
+  const label = saved ? (dirty ? t('Save Build') : t('Saved')) : t('Save Build');
   const title = saved
-    ? (dirty ? 'Overwrite the saved build with the current one' : 'Current build matches the saved one')
-    : 'Save the current build so you can compare future edits against it';
+    ? (dirty ? t('Overwrite the saved build with the current one') : t('Current build matches the saved one'))
+    : t('Save the current build so you can compare future edits against it');
   const baseCls = 'text-xs px-3 py-1.5 rounded inline-flex items-center gap-1.5 transition ';
   const stateCls = dirty
     ? 'bg-amber-500/20 hover:bg-amber-500/30 text-amber-200 border border-amber-500/40'
@@ -1273,10 +1292,10 @@ function restoreSnapshotBtn() {
   if (!build.snapshot) return el('span', { class: 'hidden' });
   // Only meaningful when current diverges from saved. If they match, there's nothing to restore.
   if (buildsEqualForCompare(build, build.snapshot)) return el('span', { class: 'hidden' });
-  const btn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300', title: 'Discard current edits and revert to the saved build' }, '↩ Restore Saved');
+  const btn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300', title: 'Discard current edits and revert to the saved build' }, t('↩ Restore Saved'));
   btn.addEventListener('click', () => {
     if (!build.snapshot) return;
-    if (!confirm('Replace the current build with the saved one? Unsaved edits will be lost.')) return;
+    if (!confirm(t('Replace the current build with the saved one? Unsaved edits will be lost.'))) return;
     // Preserve the saved build on the restored copy so the Save button flips back to green "✓ Saved"
     // (current == saved) instead of resetting to neutral. Re-saves the same snapshot reference.
     const savedCopy = cloneBuild(build.snapshot);
@@ -1291,19 +1310,19 @@ function restoreSnapshotBtn() {
 }
 
 function jsonBtn() {
-  const btn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300', title: 'View / edit / copy build JSON' }, '{ } JSON');
+  const btn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300', title: t('View / edit / copy build JSON') }, '{ } JSON');
   btn.addEventListener('click', () => openJsonDialog());
   return btn;
 }
 
 function loadSampleBtn() {
-  const btn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300', title: 'Load a fully-populated sample build (Paladin / Blessed Hammer)' }, '✨ Sample build');
+  const btn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300', title: t('Load a fully-populated sample build (Paladin / Blessed Hammer)') }, t('✨ Sample build'));
   btn.addEventListener('click', () => {
     const isEmpty = build.baseMainStat === 0 && build.skillDamagePct === 0
       && build.slots.every(s => s.affixes.length === 0 && (s.weaponTypeId ?? 'none') === 'none');
-    if (!isEmpty && !confirm('Replace the current build with the sample? Your current build will be lost (Save Build / Reset can recover it).')) return;
+    if (!isEmpty && !confirm(t('Replace the current build with the sample? Your current build will be lost (Save Build / Reset can recover it).'))) return;
     const parsed = importJsonObject(samplePaladin);
-    if (!parsed) { alert('Sample build failed to load. (Bug, please report.)'); return; }
+    if (!parsed) { alert(t('Sample build failed to load. (Bug, please report.)')); return; }
     build = parsed;
     persist(build);
     mount();
@@ -1316,7 +1335,7 @@ function openJsonDialog() {
   const panel = el('div', { class: 'bg-zinc-900 border border-zinc-700 rounded-lg shadow-xl w-full max-w-2xl max-h-[85vh] flex flex-col' });
 
   const header = el('div', { class: 'flex items-center justify-between px-4 py-3 border-b border-zinc-800' },
-    el('h3', { class: 'text-sm font-medium text-zinc-200' }, 'Build JSON'),
+    el('h3', { class: 'text-sm font-medium text-zinc-200' }, t('Build JSON')),
     Object.assign(el('button', { class: 'text-zinc-500 hover:text-zinc-200 text-lg leading-none', 'aria-label': 'Close' }), { textContent: '✕' }),
   );
   (header.lastChild as HTMLElement).addEventListener('click', () => overlay.remove());
@@ -1329,28 +1348,28 @@ function openJsonDialog() {
 
   const status = el('span', { class: 'text-xs text-zinc-500' }, '');
 
-  const copyBtn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300' }, 'Copy');
+  const copyBtn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300' }, t('Copy'));
   copyBtn.addEventListener('click', async () => {
-    try { await navigator.clipboard.writeText(ta.value); status.textContent = 'Copied to clipboard'; status.className = 'text-xs text-emerald-400'; }
-    catch { status.textContent = 'Copy failed, select & copy manually'; status.className = 'text-xs text-red-400'; }
+    try { await navigator.clipboard.writeText(ta.value); status.textContent = t('Copied to clipboard'); status.className = 'text-xs text-emerald-400'; }
+    catch { status.textContent = t('Copy failed, select & copy manually'); status.className = 'text-xs text-red-400'; }
   });
 
-  const applyBtn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-amber-600 hover:bg-amber-500 text-zinc-950 font-medium' }, 'Apply');
+  const applyBtn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-amber-600 hover:bg-amber-500 text-zinc-950 font-medium' }, t('Apply'));
   applyBtn.addEventListener('click', () => {
     const parsed = importJson(ta.value);
-    if (!parsed) { status.textContent = 'Invalid JSON, not applied'; status.className = 'text-xs text-red-400'; return; }
+    if (!parsed) { status.textContent = t('Invalid JSON, not applied'); status.className = 'text-xs text-red-400'; return; }
     build = parsed;
     persist(build);
     mount();
     overlay.remove();
   });
 
-  const cancelBtn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300' }, 'Close');
+  const cancelBtn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300' }, t('Close'));
   cancelBtn.addEventListener('click', () => overlay.remove());
 
   const body = el('div', { class: 'flex-1 flex flex-col min-h-0 p-4 gap-3' });
   body.append(
-    el('p', { class: 'text-xs text-zinc-500' }, 'Edit the JSON and click Apply to load it. Copy to share or back up.'),
+    el('p', { class: 'text-xs text-zinc-500' }, t('Edit the JSON and click Apply to load it. Copy to share or back up.')),
     ta,
     el('div', { class: 'flex items-center justify-between gap-2 flex-wrap' },
       status,
@@ -1369,7 +1388,7 @@ function openJsonDialog() {
 function resetBtn() {
   const btn = el('button', { class: 'text-xs px-3 py-1.5 rounded bg-zinc-800 hover:bg-zinc-700 text-zinc-300' }, 'Reset');
   btn.addEventListener('click', () => {
-    if (!confirm('Reset to defaults?')) return;
+    if (!confirm(t('Reset to defaults?'))) return;
     localStorage.removeItem('d4bc.build');
     window.location.hash = '';
     window.location.reload();
