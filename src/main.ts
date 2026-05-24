@@ -184,6 +184,8 @@ function renderHeader() {
             Object.assign(el('a', { href: 'https://www.youtube.com/@avarilyn', target: '_blank', class: 'text-amber-400 hover:underline' }), { textContent: t('Avarilyn') }),
             ' · web port by ',
             Object.assign(el('a', { href: 'https://github.com/jlian', target: '_blank', class: 'text-amber-400 hover:underline' }), { textContent: t('jlian') }),
+            ' · translated by ',
+            Object.assign(el('a', { href: 'https://www.joywan.com', target: '_blank', class: 'text-amber-400 hover:underline' }), { textContent: t('joywan') }),
           ),
         ),
       ),
@@ -240,12 +242,12 @@ function nakedBaselineCard() {
   const weaponSlots = build.slots.filter(s => s.id.startsWith('wep'));
   const equippedWeaponSlots = weaponSlots.filter((_s, i) => i < cls.weaponSlots);
   const skillWepSel = el('select', { class: inputCls() + ' w-full', title: 'Which equipped weapon\u2019s base damage drives this skill. \u201CAuto\u201D sums all weapons (legacy behavior, fine for single-weapon classes). Pick a specific slot for skills like Hammer of the Ancients that always use one weapon.' }) as HTMLSelectElement;
-  const autoOpt = el('option', { value: '' }, 'Auto (sum all equipped)');
+  const autoOpt = el('option', { value: '' }, t('Auto (sum all equipped)'));
   if (build.skillWeaponSlotId == null) autoOpt.setAttribute('selected', '');
   skillWepSel.append(autoOpt);
   for (const ws of equippedWeaponSlots) {
     const wt = weaponTypeById(ws.weaponTypeId ?? 'none');
-    const label = wt.id === 'none' ? `${ws.name} (empty)` : `${ws.name} \u2014 ${wt.label}`;
+    const label = wt.id === 'none' ? `${t(ws.name)} ${t('(empty)')}` : `${t(ws.name)} \u2014 ${wt.label}`;
     const opt = el('option', { value: ws.id }, label);
     if (build.skillWeaponSlotId === ws.id) opt.setAttribute('selected', '');
     skillWepSel.append(opt);

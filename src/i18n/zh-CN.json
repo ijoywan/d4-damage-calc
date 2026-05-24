@@ -144,6 +144,8 @@
     "Skill Damage % at rank 1 (e.g. 115 for Blessed Hammer)": "1 级技能伤害百分比（ 例如，祝福之锤为 115% ）",
     "Stats Sheet": "统计表格",
     " · web port by ": " · 网页制作 ",
+    " · translated by ": " · 中文翻译 ",
+    "joywan": "快乐玩",
     "Save Build": "保存构筑",
     "{ } JSON": "{ } JSON",
     "✨ Sample build": "✨ 构筑示例",
@@ -227,5 +229,8 @@
     "Copy failed, select & copy manually": "复制失败，请手动选择并复制。",
     " is the bucket\\'s current value. Smaller buckets give bigger gains: at sizes ": " 是桶的当前值。数值较小的桶带来更大的收益：在 ",
     ", the same affix is worth ": "两种尺寸下，同样的词缀在较小的桶中价值是 ",
-    " times more in the smaller bucket, so a balanced spread of multipliers maximizes the product (": " 倍，因此均衡分布各种倍数可以最大化伤害价值。（"
+    " times more in the smaller bucket, so a balanced spread of multipliers maximizes the product (": " 倍，因此均衡分布各种倍数可以最大化伤害价值。（",
+    "(empty)": "（空）",
+    "Skill weapon (which weapon drives this skill’s damage)": "技能武器（决定该技能伤害的武器）",
+    "Auto (sum all equipped)": "自动（所有已装备武器的总和）"
 }
