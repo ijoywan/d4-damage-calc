@@ -1195,7 +1195,7 @@ function buildPluggedIn(): HTMLElement {
     ['(1 + A)',
       critAdd > 0
         ? [t('Additive damage bucket. On a crit, includes the '), katexInline('+\\%'), t(' Crit Damage additive too; non-crit hits use just the base bucket.')]
-        : 'Sum of all additive damage % bonuses.',
+        : t('Sum of all additive damage % bonuses.'),
       addMath || `1 + ${dec(usedAdd)}`, 1 + usedAdd],
     [`(1 + S/${cls.divisor})`,
     [t(cls.mainStat), t(` multiplier. Divisor is `), katexInline(String(cls.divisor)), ` for `, t(build.classId), t(`(Barbarian uses `), katexInline('900'), t(', all others '), katexInline('800'), t(').')],
